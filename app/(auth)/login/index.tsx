@@ -100,7 +100,7 @@ export default function LoginScreen() {
         <View className="flex-1 justify-end pb-8">
           <View className="flex-row justify-center items-center">
             <Text className="font-geist text-white/70 text-sm">
-              Don't have an account? 
+              Do not have an account?
             </Text>
               <Text className="font-geist-medium text-light-primary text-sm ml-1">
                 Sign Up
