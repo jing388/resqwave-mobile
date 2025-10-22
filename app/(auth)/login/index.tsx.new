@@ -1,0 +1,303 @@
+import CustomButton from '@/components/custom-button';
+import CountryCodePicker from '@/components/CountryCodePicker';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Text, TextInput, TouchableOpacity, View, Image, StyleSheet, ViewStyle, ImageSourcePropType } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
+
+const COUNTRIES = [
+  { code: '+63', name: 'Philippines', flag: '🇵🇭' },
+  { code: '+1', name: 'United States', flag: '🇺🇸' },
+  { code: '+44', name: 'United Kingdom', flag: '🇬🇧' },
+  { code: '+61', name: 'Australia', flag: '🇦🇺' },
+  { code: '+65', name: 'Singapore', flag: '🇸🇬' },
+];
+
+// LogoFallback component to handle logo display with error fallback
+function LogoFallback() {
+  const [imageError, setImageError] = useState(false);
+  
+  // This will be replaced with your actual logo import
+  const logoSource: ImageSourcePropType = require('@/assets/images/logo.png');
+
+  if (imageError) {
+    return (
+      <View style={[styles.logoWrapper, { backgroundColor: '#1E40AF' }]}>
+        <Text style={styles.logoText}>RW</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.logoWrapper}>
+      <Image 
+        source={logoSource}
+        style={styles.logo}
+        resizeMode="contain"
+        onError={() => setImageError(true)}
+      />
+    </View>
+  );
+}
+
+export default function LoginScreen() {
+  const router = useRouter();
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(COUNTRIES[0]);
+  
+  // Check if both fields are filled to enable the button
+  const isFormValid = phoneNumber.trim().length > 0 && password.trim().length > 0;
+
+  const handleLogin = () => {
+    if (isFormValid) {
+      // Handle login logic here
+      console.log('Login attempted with:', { phoneNumber, password });
+      // For now, navigate to tabs
+      router.push('/(tabs)');
+    }
+  };
+
+  const handleForgotPassword = () => {
+    // Handle forgot password logic
+    console.log('Forgot password pressed');
+  };
+
+  return (
+    <View style={styles.container}>
+      {/* Gradient Background */}
+      <LinearGradient
+        colors={['#1F2937', '#171717']}
+        style={StyleSheet.absoluteFill}
+      />
+      
+      {/* Background Ellipse */}
+      <View style={styles.backgroundEllipse} />
+
+      <View style={styles.content}>
+        {/* Logo and Title */}
+        <View style={styles.logoContainer}>
+          <LogoFallback />
+          <Text style={styles.title}>Log in to ResQWave</Text>
+          <Text style={styles.subtitle}>Stronger Signals, Safer Communities.</Text>
+        </View>
+
+        {/* Form */}
+        <View style={styles.formContainer}>
+          {/* Phone Number Input with Country Code */}
+          <View style={styles.phoneInputContainer}>
+            <CountryCodePicker 
+              selectedCountry={selectedCountry} 
+              onSelect={setSelectedCountry} 
+            />
+            
+            {/* Phone Number */}
+            <View style={styles.phoneInputWrapper}>
+              <TextInput
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+                placeholder="Phone Number"
+                placeholderTextColor="#A3A3A3"
+                keyboardType="phone-pad"
+                style={styles.phoneInput}
+              />
+            </View>
+          </View>
+
+          {/* Password Input */}
+          <View style={styles.passwordContainer}>
+            <TextInput
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Password"
+              placeholderTextColor="#A3A3A3"
+              secureTextEntry={!showPassword}
+              style={styles.passwordInput}
+            />
+            <TouchableOpacity 
+              onPress={() => setShowPassword(!showPassword)}
+              style={styles.passwordToggle}
+            >
+              <Text style={styles.passwordToggleText}>
+                {showPassword ? '👁️' : '👁️‍🗨️'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Forgot Password */}
+          <TouchableOpacity 
+            onPress={handleForgotPassword} 
+            style={styles.forgotPasswordButton}
+          >
+            <Text style={styles.forgotPasswordText}>
+              Forgot your password?
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Login Button */}
+      <View style={styles.buttonContainer}>
+        <CustomButton
+          title="Login"
+          onPress={handleLogin}
+          variant={isFormValid ? "gradient-accent" : "primary"}
+          size="lg"
+          width="full"
+          disabled={!isFormValid}
+        />
+      </View>
+      
+      {/* Footer with Sign Up link */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>
+          Do not have an account?{' '}
+        </Text>
+        <TouchableOpacity onPress={() => console.log('Navigate to Sign Up')}>
+          <Text style={styles.signUpText}>
+            Sign Up
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <StatusBar style="light" />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#171717',
+  },
+  backgroundEllipse: {
+    position: 'absolute',
+    left: -683,
+    width: 1366,
+    height: 1366,
+    top: '50%',
+    transform: [{ translateY: -683 }],
+    backgroundColor: 'rgba(38, 38, 38, 0.5)',
+    borderRadius: 683,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 64,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginTop: 64,
+    marginBottom: 48,
+  },
+  logoWrapper: {
+    width: 60,
+    height: 60,
+    marginBottom: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#1E40AF',
+    borderRadius: 12,
+    padding: 10,
+  },
+  logo: {
+    width: '100%',
+    height: '100%',
+    tintColor: 'white',
+  },
+  logoText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  title: {
+    fontFamily: 'Geist-Bold',
+    fontSize: 20,
+    color: 'white',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontFamily: 'Geist-Regular',
+    fontSize: 12,
+    color: '#A3A3A3',
+    textAlign: 'center',
+  },
+  formContainer: {
+    gap: 16,
+  },
+  phoneInputContainer: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  phoneInputWrapper: {
+    flex: 1,
+  },
+  phoneInput: {
+    backgroundColor: '#262626',
+    borderWidth: 1,
+    borderColor: '#404040',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    height: 49,
+    color: 'white',
+    fontFamily: 'Geist-Regular',
+    fontSize: 14,
+  },
+  passwordContainer: {
+    position: 'relative',
+  },
+  passwordInput: {
+    backgroundColor: '#262626',
+    borderWidth: 1,
+    borderColor: '#404040',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    height: 49,
+    color: 'white',
+    fontFamily: 'Geist-Regular',
+    fontSize: 14,
+    paddingRight: 40,
+  },
+  passwordToggle: {
+    position: 'absolute',
+    right: 12,
+    top: '50%',
+    transform: [{ translateY: -10 }],
+  },
+  passwordToggleText: {
+    fontSize: 20,
+    color: '#A3A3A3',
+  },
+  forgotPasswordButton: {
+    alignSelf: 'center',
+    marginTop: 8,
+  },
+  forgotPasswordText: {
+    fontFamily: 'Geist-Medium',
+    fontSize: 12,
+    color: '#A3A3A3',
+  },
+  buttonContainer: {
+    paddingHorizontal: 24,
+    paddingBottom: 40,
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: 32,
+  },
+  footerText: {
+    fontFamily: 'Geist-Regular',
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.7)',
+  },
+  signUpText: {
+    fontFamily: 'Geist-Medium',
+    fontSize: 14,
+    color: '#60A5FA',
+    marginLeft: 4,
+  },
+});
