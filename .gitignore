@@ -41,3 +41,45 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Build files
+/build
+/dist
+*.apk
+*.aab
+*.ipa
+*.xcarchive
+
+# Local development
+.env
+.env.*
+!.env.example
+
+# IDE specific files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Testing
+coverage/
+
+# Misc
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Package files
+*.pkg
+*.tgz
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
