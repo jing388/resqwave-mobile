@@ -11,11 +11,11 @@ import {
   TextInput, 
   TouchableOpacity, 
   View, 
-  SafeAreaView,
   ScrollView,
   Keyboard,
   TouchableWithoutFeedback
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -44,10 +44,11 @@ export default function LoginScreen() {
 
   const handleLogin = () => {
     if (isFormValid) {
-      // Handle login logic here
-      console.log('Login attempted with:', { phoneNumber, password });
-      // Navigate to the main app
-      router.replace('/(tabs)');
+      // For now, we'll navigate to the verification page
+      // In a real app, you would typically verify credentials first
+      console.log('Navigating to verification page');
+      // @ts-ignore - We know this route exists
+      router.push('/verification');
     }
   };
 
@@ -67,7 +68,7 @@ export default function LoginScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
         {/* Gradient Background */}
         <LinearGradient
           colors={['#1F2937', '#171717']}
