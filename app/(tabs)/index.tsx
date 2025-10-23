@@ -1,98 +1,279 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { StyleSheet, View, TouchableOpacity, Dimensions, StatusBar, Platform, PermissionsAndroid, Image } from 'react-native';
+import * as Location from 'expo-location';
+import type { LocationObject } from 'expo-location';
+import MapView, { Marker, Region, UrlTile } from 'react-native-maps';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Colors } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+const { width, height } = Dimensions.get('window');
+
+const ASPECT_RATIO = width / height;
+const LATITUDE_DELTA = 0.02;
+const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome to ResQWave Mobile!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const colorScheme = useColorScheme() || 'light';
+  const insets = useSafeAreaInsets();
+  const mapRef = useRef<MapView>(null);
+  const colors = Colors[colorScheme];
+  const [location, setLocation] = useState<LocationObject | null>(null);
+  const [region, setRegion] = useState<Region>({
+    latitude: 14.5995, // Default to Manila coordinates
+    longitude: 120.9842,
+    latitudeDelta: LATITUDE_DELTA,
+    longitudeDelta: LONGITUDE_DELTA,
+  });
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  // Request location permission
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          console.warn('Permission to access location was denied');
+          return;
+        }
+      }
+
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.error('Permission to access location was denied');
+        return;
+      }
+
+      // Get current location
+      const currentLocation = await Location.getCurrentPositionAsync({});
+      setLocation(currentLocation);
+      
+      // Update map region to current location
+      setRegion({
+        latitude: currentLocation.coords.latitude,
+        longitude: currentLocation.coords.longitude,
+        latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA,
+      });
+    })();
+  }, []);
+
+  const onRegionChangeComplete = useCallback((newRegion: Region) => {
+    setRegion(newRegion);
+  }, []);
+
+
+  const handleCenterOnUser = () => {
+    if (location) {
+      mapRef.current?.animateToRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA,
+      });
+    }
+  };
+
+  return (
+    <ThemedView style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      {/* Map View */}
+      <MapView
+        ref={mapRef}
+        style={styles.map}
+        initialRegion={region}
+        onRegionChangeComplete={onRegionChangeComplete}
+        showsUserLocation={true}
+        showsMyLocationButton={false}
+        showsCompass={false}
+        toolbarEnabled={false}
+        rotateEnabled={false}
+        loadingEnabled={true}
+        loadingIndicatorColor={colors.tint}
+        loadingBackgroundColor={colors.background}
+      >
+        {/* OpenStreetMap Tile Layer */}
+        <UrlTile
+          urlTemplate="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maximumZ={19}
+          flipY={false}
+          tileSize={256}
+        />
+        
+        {/* You can add markers here */}
+        <Marker
+          coordinate={{
+            latitude: 14.5995,
+            longitude: 120.9842,
+          }}
+          title="Sample Location"
+          description="This is a sample location"
+        >
+          <View style={styles.markerContainer}>
+            <View style={styles.markerPin}>
+              <IconSymbol name="exclamationmark.triangle.fill" size={16} color="white" />
+            </View>
+            <View style={[styles.markerArrow, { borderTopColor: colors.tint }]} />
+          </View>
+        </Marker>
+      </MapView>
+
+      {/* Top Bar */}
+      <View style={[styles.topBar, { paddingTop: insets.top + 10 }]}>
+        <View style={styles.searchContainer}>
+          <View style={styles.searchBar}>
+            <IconSymbol name="magnifyingglass" size={16} color="#9CA3AF" style={styles.searchIcon} />
+            <ThemedText style={styles.searchText}>Search location or address</ThemedText>
+          </View>
+          <TouchableOpacity style={styles.profileButton}>
+            <View style={styles.profileIcon}>
+              <IconSymbol name="person.fill" size={20} color="#FFFFFF" />
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+
+      {/* Action Buttons */}
+      <View style={styles.actionButtonsContainer}>
+        {/* Location Button */}
+        <TouchableOpacity
+          style={styles.squareButton}
+          onPress={handleCenterOnUser}
+          activeOpacity={0.8}
+        >
+          <Image 
+            source={require('@/assets/images/target-location.png')} 
+            style={styles.buttonIcon}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+
+        {/* Layers Button */}
+        <TouchableOpacity
+          style={[styles.squareButton, { marginTop: 12 }]}
+          onPress={() => {}}
+          activeOpacity={0.8}
+        >
+          <Image 
+            source={require('@/assets/images/layer-menu-stack.png')} 
+            style={[styles.buttonIcon, { width: 20, height: 20 }]}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+      </View>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  topBar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 20,
+    zIndex: 10,
+    alignItems: 'center',
+  },
+  searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    width: '100%',
+    paddingHorizontal: 16,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  searchBar: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginRight: 12,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchText: {
+    color: '#9CA3AF',
+    fontSize: 14,
+    fontFamily: 'Geist-Regular',
+  },
+  profileButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: '#3B82F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  actionButtonsContainer: {
     position: 'absolute',
-  },
+    right: 20,
+    bottom: 100,
+    alignItems: 'flex-end',
+  } as const,
+  squareButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    backgroundColor: 'rgba(17, 24, 39, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  } as const,
+  buttonIcon: {
+    width: 24,
+    height: 24,
+    tintColor: '#FFFFFF',
+  } as const,
+  markerContainer: {
+    alignItems: 'center',
+  } as const,
+  markerPin: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#FF3B30',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'white',
+  } as const,
+  markerArrow: {
+    width: 0,
+    height: 0,
+    marginTop: -2,
+    borderLeftWidth: 8,
+    borderRightWidth: 8,
+    borderTopWidth: 10,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderTopColor: '#FF3B30',
+  } as const,
 });
