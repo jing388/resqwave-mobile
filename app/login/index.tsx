@@ -1,32 +1,23 @@
 import CustomButton from '@/components/custom-button';
-import CountryCodePicker from '@/components/CountryCodePicker';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { 
-  Image, 
-  KeyboardAvoidingView, 
-  Platform, 
-  StyleSheet, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  View, 
-  ScrollView,
+import {
+  Image,
   Keyboard,
-  TouchableWithoutFeedback
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 
-const COUNTRIES = [
-  { code: '+63', name: 'Philippines', flag: '🇵🇭' },
-  { code: '+1', name: 'United States', flag: '🇺🇸' },
-  { code: '+44', name: 'United Kingdom', flag: '🇬🇧' },
-  { code: '+61', name: 'Australia', flag: '🇦🇺' },
-  { code: '+65', name: 'Singapore', flag: '🇸🇬' },
-];
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -37,7 +28,6 @@ export default function LoginScreen() {
     phone: false,
     password: false
   });
-  const [selectedCountry, setSelectedCountry] = useState(COUNTRIES[0]);
   
   // Check if both fields are filled to enable the button
   const isFormValid = phoneNumber.trim().length >= 10 && password.trim().length >= 6;
@@ -47,7 +37,6 @@ export default function LoginScreen() {
       // For now, we'll navigate to the verification page
       // In a real app, you would typically verify credentials first
       console.log('Navigating to verification page');
-      // @ts-ignore - We know this route exists
       router.push('/verification');
     }
   };
@@ -68,66 +57,70 @@ export default function LoginScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
-      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      <SafeAreaView className="flex-1 bg-black" edges={['top', 'left', 'right']}>
         {/* Gradient Background */}
         <LinearGradient
           colors={['#1F2937', '#171717']}
-          style={StyleSheet.absoluteFill}
+          className="absolute inset-0"
         />
         
         {/* Custom Header */}
-        <View style={styles.header}>
+        <View className="flex-row items-center justify-between p-5 pt-0 android:pt-5">
           <TouchableOpacity 
-            style={styles.backButton}
+            className="w-10 h-10 justify-center items-center"
             onPress={handleBack}
           >
             <Image 
               source={require('@/assets/images/left-arrow.png')} 
-              style={styles.backArrow}
+              className="w-6 h-6"
+              style={{ tintColor: 'white' }}
               resizeMode="contain"
             />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Login</Text>
-          <View style={styles.headerRight} />
+          <View className="w-10" />
         </View>
         
         <KeyboardAvoidingView 
-          style={styles.keyboardAvoidingView}
+          className="flex-1 relative"
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
         >
           <ScrollView 
-            contentContainerStyle={styles.scrollContent}
+            contentContainerStyle={{ flexGrow: 1, paddingBottom: 200 }}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.content}>
+            <View className="flex-1 px-6">
               {/* Logo and Title */}
-              <View style={styles.logoContainer}>
-                <View style={styles.logoWrapper}>
+              <View className="items-center mb-10">
+                <View className="w-20 h-20 justify-center items-center">
                   <Image 
                     source={require('@/assets/images/ResQWaveLogo.png')}
-                    style={styles.logo}
+                    className="w-10 h-10"
                     resizeMode="contain"
                   />
                 </View>
-                <Text style={styles.title}>Log in to ResQWave</Text>
-                <Text style={styles.subtitle}>Stronger Signals, Safer Communities.</Text>
+                <Text className="text-gray-50 text-4xl font-geist-semibold mb-4 text-center">
+                  Log in to ResQWave
+                </Text>
               </View>
 
               {/* Form */}
-              <View style={styles.formContainer}>
+              <View className="gap-8 mb-8">
                 {/* Phone Number Input */}
-                <View style={[
-                  styles.inputContainer, 
-                  isFocused.phone && styles.inputFocused
-                ]}>
-                  <Text style={styles.inputLabel}>Phone Number</Text>
-                  <View style={styles.phoneInputWrapper}>
-                    <CountryCodePicker
-                      selectedCountry={selectedCountry}
-                      onSelect={setSelectedCountry}
-                    />
+                <View className="relative">
+                  <Text className="text-gray-400 text-sm font-geist-medium absolute -top-2 left-3 bg-gray-800 px-1 z-10">
+                    Phone Number
+                  </Text>
+                  <View className={`flex-row items-center bg-gray-800 rounded-xl border h-16 ${isFocused.phone ? 'border-blue-500' : 'border-gray-600'}`}>
+                    <View className="flex-row items-center h-8 px-5 border-r border-gray-600">
+                      <Text className="text-gray-50 text-base font-geist-medium mr-2">
+                        🇵🇭
+                      </Text>
+                      <Text className="text-gray-50 text-base font-geist-medium">
+                        +63
+                      </Text>
+                    </View>
                     <TextInput
                       value={phoneNumber}
                       onChangeText={setPhoneNumber}
@@ -136,19 +129,18 @@ export default function LoginScreen() {
                       placeholder="Enter your phone number"
                       placeholderTextColor="#6B7280"
                       keyboardType="phone-pad"
-                      style={styles.phoneInput}
+                      className="flex-1 text-gray-50 text-base h-full ml-3 font-geist-regular py-0 pr-3"
                       maxLength={11}
                     />
                   </View>
                 </View>
 
                 {/* Password Input */}
-                <View style={[
-                  styles.inputContainer, 
-                  isFocused.password && styles.inputFocused
-                ]}>
-                  <Text style={styles.inputLabel}>Password</Text>
-                  <View style={styles.passwordContainer}>
+                <View className="relative">
+                  <Text className="text-gray-400 text-sm font-geist-medium absolute -top-2 left-3 bg-gray-800 px-1 z-10">
+                    Password
+                  </Text>
+                  <View className={`flex-row items-center bg-gray-800 rounded-xl h-16 px-4 border ${isFocused.password ? 'border-blue-500' : 'border-gray-600'}`}>
                     <TextInput
                       value={password}
                       onChangeText={setPassword}
@@ -157,14 +149,14 @@ export default function LoginScreen() {
                       placeholder="Enter your password"
                       placeholderTextColor="#6B7280"
                       secureTextEntry={!showPassword}
-                      style={styles.passwordInput}
+                      className="flex-1 text-gray-50 text-base h-full pr-2 font-geist-regular py-0"
                       autoCapitalize="none"
                     />
                     <TouchableOpacity 
                       onPress={() => setShowPassword(!showPassword)}
-                      style={styles.passwordToggle}
+                      className="p-2"
                     >
-                      <Text style={styles.passwordToggleText}>
+                      <Text className="text-gray-400 text-xs font-geist-semibold uppercase">
                         {showPassword ? (
                           <Ionicons name="eye-off" size={20} color="#9CA3AF" />
                         ) : (
@@ -178,9 +170,9 @@ export default function LoginScreen() {
                 {/* Forgot Password */}
                 <TouchableOpacity 
                   onPress={handleForgotPassword} 
-                  style={styles.forgotPasswordButton}
+                  className="self-center mt-1 p-2"
                 >
-                  <Text style={styles.forgotPasswordText}>
+                  <Text className="text-foreground-muted text-md font-geist-medium">
                     Forgot your password?
                   </Text>
                 </TouchableOpacity>
@@ -189,8 +181,16 @@ export default function LoginScreen() {
           </ScrollView>
           
           {/* Fixed Bottom Area */}
-          <View style={styles.footerContainer}>
-            <View style={styles.buttonContainer}>
+          <View style={{ 
+            padding: 20, 
+            paddingBottom: Platform.OS === 'ios' ? 40 : 20,
+            backgroundColor: '#171717',
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0
+          }}>
+            <View className="mt-4 mb-2">
               <CustomButton
                 title="Login"
                 onPress={handleLogin}
@@ -200,17 +200,6 @@ export default function LoginScreen() {
                 disabled={!isFormValid}
               />
             </View>
-            
-            <View style={styles.signUpContainer}>
-              <Text style={styles.footerText}>
-                Do not have an account?{' '}
-              </Text>
-              <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-                <Text style={styles.signUpText}>
-                  Sign Up
-                </Text>
-              </TouchableOpacity>
-            </View>
           </View>
         </KeyboardAvoidingView>
         <StatusBar style="light" backgroundColor="#000000" />
@@ -219,196 +208,4 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000000',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 20,
-    paddingTop: Platform.OS === 'android' ? 20 : 0,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  backArrow: {
-    width: 24,
-    height: 24,
-    tintColor: 'white',
-  },
-  headerTitle: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600',
-    fontFamily: 'Geist_600SemiBold',
-  },
-  headerRight: {
-    width: 40, // Same as backButton for balance
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-    position: 'relative',
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingBottom: 200, // More space for form content
-  },
-  inputFocused: {
-    borderColor: '#3B82F6',
-  },
-  footerContainer: {
-    padding: 20,
-    paddingBottom: Platform.OS === 'ios' ? 40 : 20,
-    backgroundColor: '#171717',
-    borderTopWidth: 1,
-    borderTopColor: '#2D3748',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  signUpContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 16,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 20,
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  logoWrapper: {
-    width: 80,
-    height: 80,
-    marginBottom: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logo: {
-    width: '100%',
-    height: '100%',
-  },
-  title: {
-    color: '#F9FAFB',
-    fontSize: 24,
-    fontFamily: 'Geist_700Bold',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  subtitle: {
-    color: '#9CA3AF',
-    fontSize: 14,
-    fontFamily: 'Geist_400Regular',
-    textAlign: 'center',
-  },
-  formContainer: {
-    gap: 16,
-    marginBottom: 32,
-  },
-  inputContainer: {
-    backgroundColor: '#1F2937',
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#374151',
-  },
-  inputLabel: {
-    color: '#9CA3AF',
-    fontSize: 14,
-    marginBottom: 8,
-    fontFamily: 'Geist_500Medium',
-    position: 'absolute',
-    top: -8,
-    left: 12,
-    backgroundColor: '#1F2937',
-    paddingHorizontal: 4,
-    zIndex: 1,
-  },
-  phoneInputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 12,
-    backgroundColor: '#1F2937',
-    borderWidth: 1,
-    borderColor: '#374151',
-    height: 56,
-  },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1F2937',
-    borderRadius: 12,
-    height: 56,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: '#374151',
-  },
-  phoneInput: {
-    flex: 1,
-    color: '#F9FAFB',
-    fontSize: 16,
-    height: '100%',
-    marginLeft: 12,
-    fontFamily: 'Geist_400Regular',
-    paddingVertical: 0,
-    paddingRight: 12,
-  },
-  passwordInput: {
-    flex: 1,
-    color: '#F9FAFB',
-    fontSize: 16,
-    height: '100%',
-    paddingRight: 8,
-    fontFamily: 'Geist_400Regular',
-    paddingVertical: 0,
-  },
-  passwordToggle: {
-    padding: 8,
-  },
-  passwordToggleText: {
-    color: '#9CA3AF',
-    fontSize: 12,
-    fontFamily: 'Geist_600SemiBold',
-    textTransform: 'uppercase',
-  },
-  forgotPasswordButton: {
-    alignSelf: 'center',
-    marginTop: 4,
-    padding: 8,
-  },
-  forgotPasswordText: {
-    color: '#3B82F6',
-    fontSize: 14,
-    fontFamily: 'Geist_500Medium',
-  },
-  buttonContainer: {
-    marginTop: 16,
-    marginBottom: 16,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 8,
-    marginBottom: 24,
-  },
-  footerText: {
-    color: '#9CA3AF',
-    fontSize: 14,
-    fontFamily: 'Geist_400Regular',
-  },
-  signUpText: {
-    color: '#3B82F6',
-    fontSize: 14,
-    fontFamily: 'Geist_600SemiBold',
-  },
-});
+

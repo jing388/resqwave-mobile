@@ -1,51 +1,40 @@
 import CustomButton from '@/components/custom-button';
 import { Ionicons } from '@expo/vector-icons';
-import * as Clipboard from 'expo-clipboard';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
+  ScrollView,
   Text,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View
 } from 'react-native';
-import Animated, { FadeIn, useSharedValue, withTiming } from 'react-native-reanimated';
+import { OtpInput } from 'react-native-otp-entry';
+import Animated, { useSharedValue, withTiming } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function VerificationScreen() {
   const router = useRouter();
-  const [code, setCode] = useState(['', '', '', '', '', '']);
+  const [code, setCode] = useState('');
   const [resendTime, setResendTime] = useState(30);
   const [isResendDisabled, setIsResendDisabled] = useState(true);
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationSuccess, setVerificationSuccess] = useState(false);
   const scale = useSharedValue(1);
-  const inputRefs = [
-    useRef<TextInput>(null),
-    useRef<TextInput>(null),
-    useRef<TextInput>(null),
-    useRef<TextInput>(null),
-    useRef<TextInput>(null),
-    useRef<TextInput>(null)
-  ];
   
-  // Check if all 6 digits are entered
-  const isCodeComplete = code.every(digit => digit !== '');
+  const isCodeComplete = code.length === 6;
 
-  // Handle back button press
   const handleBack = () => {
-    router.back();
+    router.replace('/login');
   };
 
-  // Handle verification
   const handleVerify = async () => {
     if (!isCodeComplete || isVerifying) return;
     
@@ -74,66 +63,10 @@ export default function VerificationScreen() {
     }
   };
 
-  // Handle code input change
-  const handleCodeChange = (text: string, index: number) => {
-    // Only allow numbers and limit to 1 character
-    const numericValue = text.replace(/[^0-9]/g, '');
-    
-    if (numericValue === '') {
-      // If backspace, move to previous input if current is empty
-      const newCode = [...code];
-      newCode[index] = '';
-      setCode(newCode);
-      
-      if (index > 0) {
-        inputRefs[index - 1].current?.focus();
-      }
-      return;
-    }
-    
-    // Update the code with the new digit
-    const newCode = [...code];
-    newCode[index] = numericValue[0]; // Only take the first character
-    setCode(newCode);
-
-    // Auto focus next input if not the last one
-    if (index < 5) {
-      inputRefs[index + 1].current?.focus();
-    }
+  const handleCodeChange = (text: string) => {
+    setCode(text);
   };
 
-  // Handle backspace
-  const handleKeyPress = (e: any, index: number) => {
-    if (e.nativeEvent.key === 'Backspace' && !code[index] && index > 0) {
-      inputRefs[index - 1].current?.focus();
-    }
-  };
-  
-  // Handle paste from clipboard
-  const handlePaste = async (index: number) => {
-    try {
-      const text = await Clipboard.getStringAsync();
-      const digits = text.replace(/[^0-9]/g, '').split('').slice(0, 6);
-      
-      if (digits.length === 6) {
-        const newCode = [...code];
-        digits.forEach((digit: string, i: number) => {
-          if (index + i < 6) {
-            newCode[index + i] = digit;
-          }
-        });
-        setCode(newCode);
-        
-        // Focus the last input
-        const lastIndex = Math.min(index + digits.length - 1, 5);
-        inputRefs[lastIndex].current?.focus();
-      }
-    } catch (error) {
-      console.error('Error pasting from clipboard:', error);
-    }
-  };
-
-  // Handle resend code
   const handleResend = () => {
     if (isResendDisabled) return;
     
@@ -145,7 +78,6 @@ export default function VerificationScreen() {
     console.log('Resending verification code...');
   };
 
-  // Countdown timer for resend
   useEffect(() => {
     let timer: number;
     
@@ -168,135 +100,165 @@ export default function VerificationScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
-      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      <SafeAreaView className="flex-1 bg-zinc-900" edges={['top', 'left', 'right']}>
         {/* Gradient Background */}
         <LinearGradient
           colors={['#1F2937', '#171717']}
-          style={StyleSheet.absoluteFill}
+          className="absolute inset-0"
         />
         
-        {/* Back Button */}
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={handleBack}
-        >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
+        {/* Custom Header */}
+        <View className="flex-row items-center justify-between p-5 pt-0 android:pt-5">
+          <TouchableOpacity 
+            className="w-10 h-10 justify-center items-center"
+            onPress={handleBack}
+          >
+            <Image 
+              source={require('@/assets/images/left-arrow.png')} 
+              className="w-6 h-6"
+              style={{ tintColor: 'white' }}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+          <View className="w-10" />
+        </View>
         
         <KeyboardAvoidingView 
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.contentContainer}
+          className="flex-1 relative"
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
         >
-          {/* Verification Content */}
-          <View style={styles.verificationContainer}>
-            {/* Email Icon */}
-            <View style={styles.iconContainer}>
-              <Ionicons name="mail" size={24} color="#3B82F6" />
-            </View>
-            
-            {/* Title and Description */}
-            <Text style={styles.title}>Enter verification code</Text>
-            <Text style={styles.description}>
-              Please enter the verification code we sent to your registered number/email to continue.
-            </Text>
-            
-            {/* OTP Input Fields */}
-            <View style={styles.otpContainer}>
-              {code.map((digit, index) => {
-                const inputStyle = [
-                  styles.otpInputContainer,
-                  isCodeComplete && styles.otpInputContainerComplete,
-                  verificationSuccess && styles.otpInputContainerSuccess,
-                  isVerifying && styles.otpInputContainerVerifying,
-                ];
+          <ScrollView 
+            contentContainerStyle={{ flexGrow: 1, paddingBottom: 200 }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            <View className="flex-1 pt-5">
+              {/* Verification Content */}
+              <View className="items-center mb-10">
+                {/* Email Icon */}
+                <View className="w-12 h-12 rounded-full bg-blue-500/10 justify-center items-center mb-5">
+                  <Ionicons name="mail" size={24} color="#3B82F6" />
+                </View>
                 
-                return (
-                  <Animated.View 
-                    key={index} 
-                    style={[
-                      inputStyle,
-                      verificationSuccess && {
-                        transform: [{ scale: scale }],
-                        backgroundColor: '#10B981',
-                      },
-                    ]}
-                    entering={verificationSuccess ? FadeIn.delay(index * 100) : undefined}
-                  >
-                    {verificationSuccess ? (
-                      <Ionicons name="checkmark" size={24} color="white" />
-                    ) : (
-                      <TextInput
-                        ref={inputRefs[index]}
-                        style={[styles.otpInput, verificationSuccess && { color: 'white' }]}
-                        value={digit}
-                        onChangeText={(text) => handleCodeChange(text, index)}
-                        onKeyPress={(e) => handleKeyPress(e, index)}
-                        onFocus={() => {
-                          inputRefs[index].current?.setNativeProps({
-                            selection: { start: 0, end: 1 }
-                          });
-                        }}
-                        onPressIn={() => {
-                          if (digit === '' && index > 0) {
-                            const firstEmptyIndex = code.findIndex(d => d === '');
-                            const targetIndex = firstEmptyIndex === -1 ? index : Math.min(firstEmptyIndex, index);
-                            inputRefs[targetIndex].current?.focus();
-                          }
-                        }}
-onSubmitEditing={() => {
-                          if (index < 5) {
-                            inputRefs[index + 1].current?.focus();
-                          } else if (isCodeComplete) {
-                            handleVerify();
-                          }
-                        }}
-                        keyboardType="number-pad"
-                        maxLength={1}
-                        selectTextOnFocus
-                        textAlign="center"
-                        autoFocus={index === 0}
-                        selectionColor="#3B82F6"
-                        cursorColor="#3B82F6"
-                        editable={!isVerifying && !verificationSuccess}
-                      />
-                    )}
-                  </Animated.View>
-                );
-              })}
-            </View>
-            
-            {/* Resend Code */}
-            <View style={styles.resendContainer}>
-              <Text style={styles.resendText}>
-                Never received any code?{' '}
-                <Text 
-                  style={[
-                    styles.resendLink, 
-                    isResendDisabled && styles.resendLinkDisabled
-                  ]}
-                  onPress={handleResend}
-                >
-                  Resend
+                {/* Title and Description */}
+                <Text className="text-white text-4xl font-geist-semibold text-center mb-4">
+                  Enter verification code
                 </Text>
-                {isResendDisabled && (
-                  <Text style={styles.timerText}> ({resendTime}s)</Text>
+                <Text className="text-background-muted text-md text-center font-geist-regular leading-[2] px-4 mb-[-10]">
+                  Please enter the verification code we sent to your registered number/email to continue.
+                </Text>
+              </View>
+
+              {/* OTP Input Fields */}
+              <View className="mb-8">
+                {verificationSuccess ? (
+                  <Animated.View 
+                    className="flex-row justify-center gap-2"
+                    style={{ transform: [{ scale: scale }] }}
+                  >
+                    {[...Array(6)].map((_, index) => (
+                      <View 
+                        key={index}
+                        className="w-14 h-18 rounded-lg bg-green-500 justify-center items-center"
+                      >
+                        <Ionicons name="checkmark" size={24} color="white" />
+                      </View>
+                    ))}
+                  </Animated.View>
+                ) : (
+                  <OtpInput
+                    numberOfDigits={6}
+                    focusColor="#3B82F6"
+                    focusStickBlinkingDuration={500}
+                    onTextChange={handleCodeChange}
+                    onFilled={(text) => {
+                      console.log('OTP Filled:', text);
+                      setCode(text);
+                    }}
+                    textInputProps={{
+                      accessibilityLabel: "One-Time Password",
+                    }}
+                    theme={{
+                      containerStyle: {
+                        width: '100%',
+                      },
+                      inputsContainerStyle: {
+                        gap: 8,
+                        justifyContent: 'center',
+                      },
+                      pinCodeContainerStyle: {
+                        backgroundColor: '#1F2937',
+                        borderColor: isCodeComplete ? '#3B82F6' : '#374151',
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        width: 46,
+                        height: 60,
+                      },
+                      pinCodeTextStyle: {
+                        fontSize: 24,
+                        fontWeight: 'bold',
+                        color: '#FFFFFF',
+                      },
+                      focusStickStyle: {
+                        backgroundColor: '#3B82F6',
+                        width: 2,
+                        height: 32,
+                      },
+                      focusedPinCodeContainerStyle: {
+                        borderColor: '#3B82F6',
+                        backgroundColor: '#1F2937',
+                      },
+                    }}
+                  />
                 )}
-              </Text>
+              </View>
+              
+              {/* Resend Code */}
+              <View className="items-center mt-2">
+                <Text className="text-background-muted text-md text-center font-geist-regular">
+                  Didn't receive any code?{' '}
+                  <Text 
+                    className={`${isResendDisabled ? 'text-primary' : 'text-primary underline'}`}
+                    onPress={handleResend}
+                  >
+                    Resend
+                  </Text>
+                  {isResendDisabled && (
+                    <Text className="text-background-muted"> ({resendTime}s)</Text>
+                  )}
+                </Text>
+              </View>
             </View>
-          </View>
+          </ScrollView>
         </KeyboardAvoidingView>
         
-        {/* Verify Button */}
-        <View style={styles.buttonContainer}>
-          <View style={styles.buttonWrapper}>
+        {/* Fixed Bottom Area */}
+        <View style={{ 
+          padding: 20, 
+          paddingBottom: Platform.OS === 'ios' ? 40 : 20,
+          backgroundColor: '#171717',
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0
+        }}>
+          <View className="mt-4 mb-2">
             <CustomButton
               title={isVerifying ? 'Verifying...' : verificationSuccess ? 'Success!' : 'Verify'}
               onPress={handleVerify}
-              variant={verificationSuccess ? 'gradient-accent' : 'gradient-accent'}
+              variant={isCodeComplete ? "gradient-accent" : "primary"}
+              size="lg"
               width="full"
               disabled={!isCodeComplete || isVerifying || verificationSuccess}
             />
-            {isVerifying && <ActivityIndicator style={styles.loadingIndicator} color="white" />}
+            {isVerifying && (
+              <ActivityIndicator 
+                className="absolute right-5 top-1/2" 
+                style={{ transform: [{ translateY: -10 }] }}
+                color="white" 
+              />
+            )}
           </View>
         </View>
         
@@ -306,135 +268,4 @@ onSubmitEditing={() => {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#171717',
-  },
-  contentContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
-  backButton: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    zIndex: 10,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  verificationContainer: {
-    alignItems: 'center',
-    padding: 20,
-    borderRadius: 12,
-    backgroundColor: 'rgba(38, 38, 38, 0.7)',
-    marginBottom: 20,
-  },
-  iconContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  title: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
-    fontFamily: 'Geist-Bold',
-  },
-  description: {
-    color: '#BABABA',
-    fontSize: 13,
-    textAlign: 'center',
-    marginBottom: 30,
-    fontFamily: 'Geist-Regular',
-    lineHeight: 20,
-  },
-  otpContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: 20,
-  },
-  otpInputContainer: {
-    width: 50,
-    height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#1F2937',
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#374151',
-    marginHorizontal: 4,
-  },
-  otpInputContainerSuccess: {
-    backgroundColor: '#10B981',
-  },
-  otpInputContainerVerifying: {
-    backgroundColor: 'rgba(16, 185, 129, 0.5)',
-  },
-  otpInputContainerComplete: {
-    borderColor: '#3B82F6',
-  },
-  otpInput: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    fontFamily: 'Geist-Bold',
-    padding: 0,
-    margin: 0,
-    includeFontPadding: false,
-    textAlignVertical: 'center',
-  },
-  resendContainer: {
-    marginTop: 10,
-  },
-  resendText: {
-    color: '#BABABA',
-    fontSize: 12,
-    textAlign: 'center',
-    fontFamily: 'Geist-Regular',
-  },
-  resendLink: {
-    color: '#E5E7EB',
-    textDecorationLine: 'underline',
-  },
-  resendLinkDisabled: {
-    color: '#6B7280',
-    textDecorationLine: 'none',
-  },
-  timerText: {
-    color: '#BABABA',
-  },
-  buttonContainer: {
-    padding: 20,
-    paddingBottom: 40,
-  },
-  buttonWrapper: {
-    position: 'relative',
-    width: '100%',
-  },
-  loadingIndicator: {
-    position: 'absolute',
-    right: 20,
-    top: '50%',
-    transform: [{ translateY: -10 }],
-  },
-  verifyButton: {
-    width: '100%',
-  },
-});
+

@@ -1,115 +1,51 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import CustomButton from '@/components/custom-button';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
+import { Image, Platform, Text, View } from 'react-native';
 
-const LandingPage = () => {
+export default function WelcomeScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="light" />
-      <LinearGradient
-        colors={['#1F2937', '#111827']}
-        style={StyleSheet.absoluteFill}
-      />
-      
-      <View style={styles.content}>
-        {/* Logo and App Name */}
-        <View style={styles.logoContainer}>
-          <Image
-            source={require('@/assets/images/ResQWaveLogo.png')}
-            style={styles.logo}
-            resizeMode="contain"
+    <LinearGradient
+      colors={['#1F2937', '#171717']}
+      start={{ x: 0.5, y: 0.2 }}
+      end={{ x: 0.8, y: 0.8 }}
+      className="flex-1"
+    >
+      <View className="flex-1 px-6 relative">
+        {/* Main content - centered */}
+        <View className="flex-1 items-center justify-center">
+          <Image 
+            source={require('@/assets/images/resqwave-logo.png')}
+            className="w-10 h-10 mb-4"
           />
-          <Text style={styles.appName}>ResQWave</Text>
-          <Text style={styles.tagline}>Your Emergency Response Partner</Text>
+          <Text className="font-geist-semibold text-white text-4xl leading-[1.5] text-center mb-12">
+            Stronger Signals,{'\n'}Safer Communities.
+          </Text>
         </View>
-
-        {/* Buttons */}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={[styles.button, styles.primaryButton]}
-            onPress={() => router.push('/login')}
-          >
-            <Text style={styles.buttonText}>Get Started</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.button, styles.secondaryButton]}
-            onPress={() => router.push('/login')}
-          >
-            <Text style={[styles.buttonText, styles.secondaryButtonText]}>Sign In</Text>
-          </TouchableOpacity>
+        
+        {/* Fixed Bottom Area */}
+        <View style={{ 
+          padding: 20, 
+          paddingBottom: Platform.OS === 'ios' ? 40 : 20,
+          backgroundColor: '#171717',
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0
+        }}>
+          <View className="mt-4 mb-2">
+            <CustomButton
+              title="Login"
+              onPress={() => router.push('/login')}
+              variant="gradient-accent"
+              size="lg"
+              width="full"
+            />
+          </View>
         </View>
       </View>
-    </SafeAreaView>
+    </LinearGradient>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    padding: 24,
-    justifyContent: 'space-between',
-    paddingBottom: 60,
-  },
-  logoContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 60,
-  },
-  logo: {
-    width: 180,
-    height: 180,
-    marginBottom: 20,
-  },
-  appName: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 8,
-    fontFamily: 'Inter_700Bold',
-  },
-  tagline: {
-    fontSize: 18,
-    color: '#9CA3AF',
-    textAlign: 'center',
-    fontFamily: 'Inter_400Regular',
-  },
-  buttonContainer: {
-    width: '100%',
-    gap: 16,
-  },
-  button: {
-    width: '100%',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primaryButton: {
-    backgroundColor: '#3B82F6',
-  },
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#374151',
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-    fontFamily: 'Inter_600SemiBold',
-  },
-  secondaryButtonText: {
-    color: '#E5E7EB',
-  },
-});
-
-export default LandingPage;
+}
