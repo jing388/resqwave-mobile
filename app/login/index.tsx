@@ -183,7 +183,6 @@ export default function LoginScreen() {
           <View style={{ 
             padding: 20, 
             paddingBottom: Platform.OS === 'ios' ? 40 : 20,
-            backgroundColor: '#171717',
             position: 'absolute',
             bottom: 0,
             left: 0,

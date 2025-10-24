@@ -100,7 +100,7 @@ export default function VerificationScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
-      <SafeAreaView className="flex-1 bg-background" edges={['top', 'left', 'right']}>
+      <SafeAreaView className="flex-1 bg-zinc-900" edges={['top', 'left', 'right']}>
         {/* Gradient Background */}
         <LinearGradient
           colors={['#1F2937', '#171717']}
@@ -237,7 +237,6 @@ export default function VerificationScreen() {
         <View style={{ 
           padding: 20, 
           paddingBottom: Platform.OS === 'ios' ? 40 : 20,
-          backgroundColor: '#171717',
           position: 'absolute',
           bottom: 0,
           left: 0,
