@@ -100,7 +100,7 @@ export default function VerificationScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
-      <SafeAreaView className="flex-1 bg-zinc-900" edges={['top', 'left', 'right']}>
+      <SafeAreaView className="flex-1 bg-background" edges={['top', 'left', 'right']}>
         {/* Gradient Background */}
         <LinearGradient
           colors={['#1F2937', '#171717']}
@@ -160,9 +160,9 @@ export default function VerificationScreen() {
                     {[...Array(6)].map((_, index) => (
                       <View 
                         key={index}
-                        className="w-14 h-18 rounded-lg bg-green-500 justify-center items-center"
+                        className="w-[46] h-[60] rounded-lg bg-green-500 justify-center items-center"
                       >
-                        <Ionicons name="checkmark" size={24} color="white" />
+                        <Ionicons name="checkmark" size={20} color="white" />
                       </View>
                     ))}
                   </Animated.View>

@@ -2,15 +2,14 @@ import { HapticTab } from '@/components/haptic-tab';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Tabs } from 'expo-router';
-import { Image, View } from 'react-native';
+import { FileText, Info, Map } from 'lucide-react-native';
+import { View } from 'react-native';
 
-const TabBarIcon = ({ focused, source, style }: { focused: boolean; source: any; style?: any }) => (
-  <View className={`w-15 h-15 rounded-lg justify-center items-center ${focused ? 'bg-blue-500/15' : ''}`}>  
-    <Image 
-      source={source} 
-      className="w-10 h-10"
-      style={[{ tintColor: '#FFFFFF' }, style]} 
-      resizeMode="contain"
+const TabBarIcon = ({ focused, IconComponent, size = 24 }: { focused: boolean; IconComponent: any; size?: number }) => (
+  <View className={`w-20 h-14 rounded-lg justify-center items-center ${focused ? 'bg-blue-500/15' : ''}`}>  
+    <IconComponent 
+      size={size}
+      color={focused ? '#3B82F6' : '#FFFFFF'}
     />
   </View>
 );
@@ -27,9 +26,9 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
         tabBarShowLabel: false,
         tabBarStyle: {
-          paddingTop: 10,
+          paddingTop: 15,
           height: 80,
-          backgroundColor: '#1A1A1A',
+          backgroundColor: '#171717',
         },
       }}>
       <Tabs.Screen
@@ -39,8 +38,8 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <TabBarIcon 
               focused={focused}
-              source={require('@/assets/images/map-navigator.png')}
-              style={{ width: 60, height: 60 }}
+              IconComponent={Map}
+              size={24}
             />
           ),
         }}
@@ -52,8 +51,21 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <TabBarIcon 
               focused={focused}
-              source={require('@/assets/images/layer-menu-stack.png')}
-              style={{ width: 22, height: 22 }}
+              IconComponent={Info}
+              size={24}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="reports"
+        options={{
+          title: 'Reports',
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon 
+              focused={focused}
+              IconComponent={FileText}
+              size={24}
             />
           ),
         }}

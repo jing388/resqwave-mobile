@@ -151,8 +151,8 @@ export default function HomeScreen() {
 
       {/* Action Buttons */}
       <View 
-        className="absolute right-5 items-end gap-3"
-        style={{ top: insets.top + 70 }} // Align vertically with avatar
+        className="absolute right-5 items-end gap-3 pb-4"
+        style={{ bottom: 0 }} // Push to bottom with padding
       >
         <LocationButton onPress={handleCenterOnUser} />
         <LayersButton onPress={() => {

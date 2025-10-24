@@ -3,7 +3,7 @@ import React from 'react';
 import { StatusBar, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function AboutNeighborhoodScreen() {
+export default function ReportsScreen() {
   return (
     <SafeAreaView className="flex-1 bg-black" edges={['top', 'left', 'right']}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
@@ -17,7 +17,7 @@ export default function AboutNeighborhoodScreen() {
       {/* Content */}
       <View className="flex-1 px-6 justify-center items-center">
         <Text className="text-white text-2xl font-geist-semibold text-center mb-4">
-          About Neighborhood
+          Reports
         </Text>
         <Text className="text-gray-400 text-base font-geist-regular text-center">
           This page is under development

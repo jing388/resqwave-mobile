@@ -1,5 +1,6 @@
+import { LocateFixed } from 'lucide-react-native';
 import React from 'react';
-import { Image, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 
 interface LocationButtonProps {
   onPress?: () => void;
@@ -12,7 +13,7 @@ export function LocationButton({
 }: LocationButtonProps) {
   return (
     <TouchableOpacity
-      className={`w-12 h-12 rounded-lg bg-gray-900/90 justify-center items-center border border-white/10 ${className}`}
+      className={`w-12 h-12 rounded-lg bg-background justify-center items-center border border-white/10 ${className}`}
       onPress={onPress}
       activeOpacity={0.8}
       style={{
@@ -23,11 +24,9 @@ export function LocationButton({
         elevation: 4,
       }}
     >
-      <Image 
-        source={require('@/assets/images/target-location.png')} 
-        className="w-6 h-6"
-        style={{ tintColor: '#FFFFFF' }}
-        resizeMode="contain"
+      <LocateFixed 
+        size={24} 
+        color="#FFFFFF"
       />
     </TouchableOpacity>
   );

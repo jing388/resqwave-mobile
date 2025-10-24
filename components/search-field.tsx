@@ -1,5 +1,5 @@
 import { ThemedText } from '@/components/themed-text';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Search } from 'lucide-react-native';
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
 
@@ -20,13 +20,12 @@ export function SearchField({
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <IconSymbol 
-        name="magnifyingglass" 
+      <Search 
         size={16} 
         color="#9CA3AF" 
         style={{ marginRight: 8 }}
       />
-      <ThemedText className="text-gray-400 text-sm font-geist-regular">
+      <ThemedText className="text-background-muted text-sm font-geist-regular">
         {placeholder}
       </ThemedText>
     </TouchableOpacity>
