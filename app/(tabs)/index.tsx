@@ -1,4 +1,5 @@
 import { Avatar } from '@/components/avatar';
+import { InfoSheet } from '@/components/info-sheet';
 import { LayersButton } from '@/components/layers-button';
 import { SearchField } from '@/components/search-field';
 import { ThemedView } from '@/components/themed-view';
@@ -31,6 +32,8 @@ export default function HomeScreen() {
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   });
+  const [selectedMarker, setSelectedMarker] = useState<any>(null);
+  const [sheetVisible, setSheetVisible] = useState(false);
 
   // Request location permission
   useEffect(() => {
@@ -81,6 +84,35 @@ export default function HomeScreen() {
     }
   };
 
+  const handleMarkerPress = (marker: any) => {
+    // Zoom to marker with smooth animation
+    mapRef.current?.animateToRegion({
+      latitude: marker.latitude,
+      longitude: marker.longitude,
+      latitudeDelta: 0.01, // Zoom in closer
+      longitudeDelta: 0.01,
+    }, 1000);
+
+    // Show bottom sheet
+    setSelectedMarker(marker);
+    setSheetVisible(true);
+  };
+
+  const hideBottomSheet = () => {
+    setSheetVisible(false);
+    setSelectedMarker(null);
+  };
+
+  const handleGetDirections = (markerData: any) => {
+    console.log('Get directions to:', markerData.title);
+    // Implement directions logic here
+  };
+
+  const handleMoreInfo = (markerData: any) => {
+    console.log('More info about:', markerData.title);
+    // Implement more info logic here
+  };
+
   return (
     <ThemedView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
@@ -107,20 +139,57 @@ export default function HomeScreen() {
           tileSize={256}
         />
         
-        {/* You can add markers here */}
+        {/* Sample Markers */}
         <Marker
           coordinate={{
             latitude: 14.5995,
             longitude: 120.9842,
           }}
-          title="Sample Location"
-          description="This is a sample location"
+          title="Emergency Report"
+          description="Fire incident reported"
+          onPress={() => handleMarkerPress({
+            latitude: 14.5995,
+            longitude: 120.9842,
+            title: "N-1",
+            lastUpdated: "September 25, 2023, 14:30",
+            description: "Fire incident reported in Barangay 123",
+            type: "emergency",
+            reportedBy: "Juan Dela Cruz",
+            time: "2 minutes ago"
+          })}
         >
           <View style={styles.markerContainer}>
             <View style={styles.markerPin}>
               <IconSymbol name="exclamationmark.triangle.fill" size={16} color="white" />
             </View>
             <View style={[styles.markerArrow, { borderTopColor: colors.tint }]} />
+          </View>
+        </Marker>
+
+        {/* Add more sample markers */}
+        <Marker
+          coordinate={{
+            latitude: 14.6020,
+            longitude: 120.9850,
+          }}
+          title="Safe Zone"
+          description="Evacuation center"
+          onPress={() => handleMarkerPress({
+            latitude: 14.6020,
+            longitude: 120.9850,
+            title: "Safe Zone",
+            lastUpdated: "September 25, 2023, 12:15",
+            description: "Community evacuation center with medical facilities",
+            type: "safe-zone",
+            capacity: "500 people",
+            status: "Available"
+          })}
+        >
+          <View style={styles.markerContainer}>
+            <View style={[styles.markerPin, { backgroundColor: '#34D399' }]}>
+              <IconSymbol name="checkmark.shield.fill" size={16} color="white" />
+            </View>
+            <View style={[styles.markerArrow, { borderTopColor: '#34D399' }]} />
           </View>
         </Marker>
       </MapView>
@@ -160,6 +229,15 @@ export default function HomeScreen() {
           console.log('Layers pressed');
         }} />
       </View>
+
+      {/* Info Sheet */}
+      <InfoSheet
+        visible={sheetVisible}
+        markerData={selectedMarker}
+        onClose={hideBottomSheet}
+        onGetDirections={handleGetDirections}
+        onMoreInfo={handleMoreInfo}
+      />
     </ThemedView>
   );
 }
