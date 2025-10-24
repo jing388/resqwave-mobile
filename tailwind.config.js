@@ -17,6 +17,7 @@ module.exports = {
       },
       colors: {
         // Add your custom colors at the root level
+        'background': '#171717',
         'background-muted': '#A3A3A3',
         'foreground-muted': '#94A3B8',
         'primary': '#3B82F6',

@@ -1,13 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleSheet, View, TouchableOpacity, Dimensions, StatusBar, Platform, PermissionsAndroid, Image } from 'react-native';
-import * as Location from 'expo-location';
-import type { LocationObject } from 'expo-location';
-import MapView, { Marker, Region, UrlTile } from 'react-native-maps';
-import { ThemedText } from '@/components/themed-text';
+import { Avatar } from '@/components/avatar';
+import { LayersButton } from '@/components/layers-button';
+import { SearchField } from '@/components/search-field';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { LocationButton } from '@/components/your-location-button';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import type { LocationObject } from 'expo-location';
+import * as Location from 'expo-location';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Dimensions, PermissionsAndroid, Platform, StatusBar, StyleSheet, View } from 'react-native';
+import MapView, { Marker, Region, UrlTile } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
@@ -123,48 +126,39 @@ export default function HomeScreen() {
       </MapView>
 
       {/* Top Bar */}
-      <View style={[styles.topBar, { paddingTop: insets.top + 10 }]}>
-        <View style={styles.searchContainer}>
-          <View style={styles.searchBar}>
-            <IconSymbol name="magnifyingglass" size={16} color="#9CA3AF" style={styles.searchIcon} />
-            <ThemedText style={styles.searchText}>Search location or address</ThemedText>
-          </View>
-          <TouchableOpacity style={styles.profileButton}>
-            <View style={styles.profileIcon}>
-              <IconSymbol name="person.fill" size={20} color="#FFFFFF" />
-            </View>
-          </TouchableOpacity>
+      <View 
+        className="absolute top-0 left-0 right-0 px-5 z-10 items-center"
+        style={{ paddingTop: insets.top + 10 }}
+      >
+        <View className="flex-row items-center w-full">
+          <SearchField 
+            onPress={() => {
+              // Handle search press - navigate to search screen or open search modal
+              console.log('Search pressed');
+            }}
+          />
+          <Avatar 
+            size="md"
+            imageSource={require('@/assets/images/sample-profile-picture.jpg')}
+            onPress={() => {
+              // Handle profile press - navigate to profile screen
+              console.log('Profile pressed');
+            }}
+          />
         </View>
       </View>
 
 
       {/* Action Buttons */}
-      <View style={styles.actionButtonsContainer}>
-        {/* Location Button */}
-        <TouchableOpacity
-          style={styles.squareButton}
-          onPress={handleCenterOnUser}
-          activeOpacity={0.8}
-        >
-          <Image 
-            source={require('@/assets/images/target-location.png')} 
-            style={styles.buttonIcon}
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
-
-        {/* Layers Button */}
-        <TouchableOpacity
-          style={[styles.squareButton, { marginTop: 12 }]}
-          onPress={() => {}}
-          activeOpacity={0.8}
-        >
-          <Image 
-            source={require('@/assets/images/layer-menu-stack.png')} 
-            style={[styles.buttonIcon, { width: 20, height: 20 }]}
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
+      <View 
+        className="absolute right-5 items-end gap-3"
+        style={{ top: insets.top + 70 }} // Align vertically with avatar
+      >
+        <LocationButton onPress={handleCenterOnUser} />
+        <LayersButton onPress={() => {
+          // Handle layers press - open layers menu
+          console.log('Layers pressed');
+        }} />
       </View>
     </ThemedView>
   );
@@ -177,81 +171,6 @@ const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
   },
-  topBar: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 20,
-    zIndex: 10,
-    alignItems: 'center',
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    paddingHorizontal: 16,
-  },
-  searchBar: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginRight: 12,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchText: {
-    color: '#9CA3AF',
-    fontSize: 14,
-    fontFamily: 'Geist-Regular',
-  },
-  profileButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  profileIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    backgroundColor: '#3B82F6',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  actionButtonsContainer: {
-    position: 'absolute',
-    right: 20,
-    bottom: 100,
-    alignItems: 'flex-end',
-  } as const,
-  squareButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 8,
-    backgroundColor: 'rgba(17, 24, 39, 0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  } as const,
-  buttonIcon: {
-    width: 24,
-    height: 24,
-    tintColor: '#FFFFFF',
-  } as const,
   markerContainer: {
     alignItems: 'center',
   } as const,

@@ -1,14 +1,15 @@
-import { Tabs } from 'expo-router';
-import { Image, StyleSheet, View } from 'react-native';
 import { HapticTab } from '@/components/haptic-tab';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Tabs } from 'expo-router';
+import { Image, View } from 'react-native';
 
 const TabBarIcon = ({ focused, source, style }: { focused: boolean; source: any; style?: any }) => (
-  <View style={[styles.tabIconContainer, focused && styles.activeTab]}>  
+  <View className={`w-15 h-15 rounded-lg justify-center items-center ${focused ? 'bg-blue-500/15' : ''}`}>  
     <Image 
       source={source} 
-      style={[styles.tabIcon, style]} 
+      className="w-10 h-10"
+      style={[{ tintColor: '#FFFFFF' }, style]} 
       resizeMode="contain"
     />
   </View>
@@ -26,28 +27,28 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
         tabBarShowLabel: false,
         tabBarStyle: {
+          paddingTop: 10,
           height: 80,
           backgroundColor: '#1A1A1A',
-          borderTopWidth: 1,
-          borderTopColor: '#2D2D2D',
         },
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Map',
+          title: 'Barangay Map',
           tabBarIcon: ({ focused }) => (
             <TabBarIcon 
               focused={focused}
               source={require('@/assets/images/map-navigator.png')}
+              style={{ width: 60, height: 60 }}
             />
           ),
         }}
       />
       <Tabs.Screen
-        name="layers"
+        name="about-neighborhood"
         options={{
-          title: 'Layers',
+          title: 'About Neighborhood',
           tabBarIcon: ({ focused }) => (
             <TabBarIcon 
               focused={focused}
@@ -57,37 +58,6 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="reports"
-        options={{
-          title: 'Reports',
-          tabBarIcon: ({ focused }) => (
-            <TabBarIcon 
-              focused={focused}
-              source={require('@/assets/images/clipboard-navigator.png')}
-              style={{ width: 20, height: 20 }}
-            />
-          ),
-        }}
-      />
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  tabIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  activeTab: {
-    backgroundColor: 'rgba(58, 130, 247, 0.15)',
-  },
-  tabIcon: {
-    width: 24,
-    height: 24,
-    tintColor: '#FFFFFF',
-  },
-});

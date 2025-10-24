@@ -219,8 +219,8 @@ export default function VerificationScreen() {
                 <Text className="text-background-muted text-md text-center font-geist-regular">
                   Didn't receive any code?{' '}
                   <Text 
-                    className={`${isResendDisabled ? 'text-primary' : 'text-primary underline'}`}
-                    onPress={handleResend}
+                    className={`${isResendDisabled ? 'text-gray-500' : 'text-primary underline'}`}
+                    onPress={isResendDisabled ? undefined : handleResend}
                   >
                     Resend
                   </Text>
