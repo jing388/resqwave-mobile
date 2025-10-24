@@ -95,9 +95,8 @@ export default function LoginScreen() {
               <View className="items-center mb-10">
                 <View className="w-20 h-20 justify-center items-center">
                   <Image 
-                    source={require('@/assets/images/ResQWaveLogo.png')}
+                    source={require('@/assets/images/resqwave-logo.png')}
                     className="w-10 h-10"
-                    resizeMode="contain"
                   />
                 </View>
                 <Text className="text-gray-50 text-4xl font-geist-semibold mb-4 text-center">
