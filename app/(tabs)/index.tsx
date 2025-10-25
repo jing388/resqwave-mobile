@@ -104,12 +104,12 @@ export default function HomeScreen() {
   };
 
   const handleGetDirections = (markerData: any) => {
-    console.log('Get directions to:', markerData.title);
+    console.log('Get directions to:', markerData.neighborhoodID);
     // Implement directions logic here
   };
 
   const handleMoreInfo = (markerData: any) => {
-    console.log('More info about:', markerData.title);
+    console.log('More info about:', markerData.neighborhoodID);
     // Implement more info logic here
   };
 
@@ -150,12 +150,12 @@ export default function HomeScreen() {
           onPress={() => handleMarkerPress({
             latitude: 14.5995,
             longitude: 120.9842,
-            title: "N-1",
-            lastUpdated: "September 25, 2023, 14:30",
-            description: "Fire incident reported in Barangay 123",
-            type: "emergency",
-            reportedBy: "Juan Dela Cruz",
-            time: "2 minutes ago"
+            neighborhoodID: "N-1",
+            terminalID: "TERM-001",
+            terminalAddress: "123 Main Street, Barangay Centro",
+            dateRegistered: "September 15, 2023",
+            lastUpdatedAt: "September 25, 2023, 14:30",
+            type: "emergency"
           })}
         >
           <View style={styles.markerContainer}>
@@ -177,12 +177,12 @@ export default function HomeScreen() {
           onPress={() => handleMarkerPress({
             latitude: 14.6020,
             longitude: 120.9850,
-            title: "Safe Zone",
-            lastUpdated: "September 25, 2023, 12:15",
-            description: "Community evacuation center with medical facilities",
-            type: "safe-zone",
-            capacity: "500 people",
-            status: "Available"
+            neighborhoodID: "Safe Zone Alpha",
+            terminalID: "RSQW-001",
+            terminalAddress: "456 Evacuation Center Ave, Barangay Norte",
+            dateRegistered: "August 10, 2023",
+            lastUpdatedAt: "September 25, 2023, 12:15",
+            type: "safe-zone"
           })}
         >
           <View style={styles.markerContainer}>

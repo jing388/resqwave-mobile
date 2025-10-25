@@ -1,18 +1,17 @@
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import { Radio } from 'lucide-react-native';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
 interface MarkerData {
   latitude: number;
   longitude: number;
-  title: string;
-  lastUpdated?: string;
-  description: string;
-  type: string;
-  reportedBy?: string;
-  time?: string;
-  capacity?: string;
-  status?: string;
+  neighborhoodID: string;
+  terminalID: string;
+  terminalAddress: string;
+  dateRegistered: string;
+  lastUpdatedAt: string;
+  type?: string;
 }
 
 interface InfoSheetProps {
@@ -23,6 +22,34 @@ interface InfoSheetProps {
   onMoreInfo?: (markerData: MarkerData) => void;
 }
 
+const DetailRow = ({ label, value, valueStyle }: { 
+  label: string; 
+  value: string; 
+  valueStyle?: string 
+}) => (
+  <View className="flex-row justify-between gap-4">
+    <Text className="text-white text-md font-geist-medium flex-shrink-0" style={{ width: '35%' }}>
+      {label}
+    </Text>
+    <Text className={`text-md font-geist-regular flex-1 text-right ${valueStyle || 'text-white'}`}>
+      {value}
+    </Text>
+  </View>
+);
+
+const ActionButton = ({ title, onPress, style }: {
+  title: string;
+  onPress: () => void;
+  style?: string;
+}) => (
+  <TouchableOpacity 
+    className={`flex-1 rounded-xl py-3 items-center ${style || 'bg-blue-500'}`}
+    onPress={onPress}
+  >
+    <Text className="text-white font-geist-semibold">{title}</Text>
+  </TouchableOpacity>
+);
+
 export function InfoSheet({ 
   visible, 
   markerData, 
@@ -32,8 +59,8 @@ export function InfoSheet({
 }: InfoSheetProps) {
   const bottomSheetRef = useRef<BottomSheet>(null);
   
-  // Define snap points
-  const snapPoints = useMemo(() => ['40%', '70%'], []);
+  // Define snap points - single point for fixed height, only closable
+  const snapPoints = useMemo(() => ['17%'], []);
 
   // Handle sheet changes
   const handleSheetChanges = useCallback((index: number) => {
@@ -60,6 +87,8 @@ export function InfoSheet({
       snapPoints={snapPoints}
       onChange={handleSheetChanges}
       enablePanDownToClose={true}
+      enableOverDrag={false}
+      maxDynamicContentSize={400}
       handleIndicatorStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}
       backgroundStyle={{ backgroundColor: 'transparent' }}
     >
@@ -68,77 +97,34 @@ export function InfoSheet({
         <View className="w-12 h-1 bg-white/30 rounded-full self-center mb-6" />
         
         {/* Content */}
-        <View className="gap-4">
-            {/* Title */}
-            <Text className="text-white text-2xl font-geist-semibold">
-              {markerData.title}
-            </Text>
-
-            {/* Last Updated */}
-            {markerData.lastUpdated && (
-              <View className="flex-row justify-between">
-                <Text className="text-gray-400 text-sm font-geist-medium">Last Updated:</Text>
-                <Text className="text-white text-sm font-geist-regular">{markerData.lastUpdated}</Text>
-              </View>
-            )}
-
-            {/* Description */}
-            <Text className="text-gray-300 text-base font-geist-regular">
-              {markerData.description}
-            </Text>
-            
-            {/* Details */}
-            <View className="gap-2">
-              {markerData.reportedBy && (
-                <View className="flex-row justify-between">
-                  <Text className="text-gray-400 text-sm font-geist-medium">Reported by:</Text>
-                  <Text className="text-white text-sm font-geist-regular">{markerData.reportedBy}</Text>
-                </View>
-              )}
-              
-              {markerData.time && (
-                <View className="flex-row justify-between">
-                  <Text className="text-gray-400 text-sm font-geist-medium">Time:</Text>
-                  <Text className="text-white text-sm font-geist-regular">{markerData.time}</Text>
-                </View>
-              )}
-              
-              {markerData.capacity && (
-                <View className="flex-row justify-between">
-                  <Text className="text-gray-400 text-sm font-geist-medium">Capacity:</Text>
-                  <Text className="text-white text-sm font-geist-regular">{markerData.capacity}</Text>
-                </View>
-              )}
-              
-              {markerData.status && (
-                <View className="flex-row justify-between">
-                  <Text className="text-gray-400 text-sm font-geist-medium">Status:</Text>
-                  <Text className={`text-sm font-geist-semibold ${
-                    markerData.status === 'Available' ? 'text-green-400' : 'text-yellow-400'
-                  }`}>
-                    {markerData.status}
-                  </Text>
-                </View>
-              )}
+        <View className="gap-4 mb-2">
+          {/* Title - Neighborhood ID */}
+          <View className="flex-row items-center gap-3 mb-4">
+            <View className="bg-gray-700 rounded-lg p-3">
+              <Radio size={22} color="#ffffff" />
             </View>
-            
-            {/* Action Buttons */}
-            <View className="flex-row gap-3 mt-4">
-              <TouchableOpacity 
-                className="flex-1 bg-blue-500 rounded-xl py-3 items-center"
-                onPress={() => onGetDirections?.(markerData)}
-              >
-                <Text className="text-white font-geist-semibold">Get Directions</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                className="flex-1 bg-gray-700 rounded-xl py-3 items-center"
-                onPress={() => onMoreInfo?.(markerData)}
-              >
-                <Text className="text-white font-geist-semibold">More Info</Text>
-              </TouchableOpacity>
+            <View className="flex-1">
+              <Text className="text-white text-2xl font-geist-semibold">
+                {markerData.neighborhoodID}
+              </Text>
+              <Text className="text-gray-400 text-sm font-geist-regular mt-1">
+                {markerData.latitude}, {markerData.longitude}
+              </Text>
             </View>
           </View>
+
+          {/* Terminal ID */}
+          <DetailRow label="Terminal ID" value={markerData.terminalID} />
+
+          {/* Terminal Address */}
+          <DetailRow label="Terminal Address" value={markerData.terminalAddress} />
+
+          {/* Date Registered */}
+          <DetailRow label="Date Registered" value={markerData.dateRegistered} />
+
+          {/* Last Updated At */}
+          <DetailRow label="Last Updated At" value={markerData.lastUpdatedAt} />
+        </View>
       </BottomSheetView>
     </BottomSheet> 
   );
