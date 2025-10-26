@@ -123,8 +123,8 @@ export default function LoginScreen() {
                     <TextInput
                       value={phoneNumber}
                       onChangeText={setPhoneNumber}
-                      onFocus={() => setIsFocused({...isFocused, phone: true})}
-                      onBlur={() => setIsFocused({...isFocused, phone: false})}
+                      onFocus={() => setIsFocused(prev => ({...prev, phone: true}))}
+                      onBlur={() => setIsFocused(prev => ({...prev, phone: false}))}
                       placeholder="Enter your phone number"
                       placeholderTextColor="#6B7280"
                       keyboardType="phone-pad"
@@ -143,8 +143,8 @@ export default function LoginScreen() {
                     <TextInput
                       value={password}
                       onChangeText={setPassword}
-                      onFocus={() => setIsFocused({...isFocused, password: true})}
-                      onBlur={() => setIsFocused({...isFocused, password: false})}
+                      onFocus={() => setIsFocused(prev => ({...prev, password: true}))}
+                      onBlur={() => setIsFocused(prev => ({...prev, password: false}))}
                       placeholder="Enter your password"
                       placeholderTextColor="#6B7280"
                       secureTextEntry={!showPassword}
