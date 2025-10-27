@@ -1,5 +1,5 @@
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
-import { Radio } from 'lucide-react-native';
+import { Pencil, Radio } from 'lucide-react-native';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
@@ -20,6 +20,7 @@ interface InfoSheetProps {
   onClose: () => void;
   onGetDirections?: (markerData: MarkerData) => void;
   onMoreInfo?: (markerData: MarkerData) => void;
+  onEdit?: (markerData: MarkerData) => void;
 }
 
 const DetailRow = ({ label, value, valueStyle }: { 
@@ -37,25 +38,14 @@ const DetailRow = ({ label, value, valueStyle }: {
   </View>
 );
 
-const ActionButton = ({ title, onPress, style }: {
-  title: string;
-  onPress: () => void;
-  style?: string;
-}) => (
-  <TouchableOpacity 
-    className={`flex-1 rounded-xl py-3 items-center ${style || 'bg-blue-500'}`}
-    onPress={onPress}
-  >
-    <Text className="text-white font-geist-semibold">{title}</Text>
-  </TouchableOpacity>
-);
 
 export function InfoSheet({ 
   visible, 
   markerData, 
   onClose, 
   onGetDirections, 
-  onMoreInfo 
+  onMoreInfo,
+  onEdit 
 }: InfoSheetProps) {
   const bottomSheetRef = useRef<BottomSheet>(null);
   
@@ -111,6 +101,14 @@ export function InfoSheet({
                 {markerData.latitude}, {markerData.longitude}
               </Text>
             </View>
+            {/* Edit Button */}
+            <TouchableOpacity
+              className="bg-blue-500 rounded-lg p-3"
+              onPress={() => onEdit?.(markerData)}
+              activeOpacity={0.7}
+            >
+              <Pencil size={20} color="#ffffff" />
+            </TouchableOpacity>
           </View>
 
           {/* Terminal ID */}
