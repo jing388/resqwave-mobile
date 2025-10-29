@@ -18,7 +18,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const { width, height } = Dimensions.get('window');
 
 const ASPECT_RATIO = width / height;
-const LATITUDE_DELTA = 0.02;
+const LATITUDE_DELTA = 0.005; // More zoomed in for subdivision view
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 export default function HomeScreen() {
@@ -28,8 +28,8 @@ export default function HomeScreen() {
   const colors = Colors[colorScheme];
   const [location, setLocation] = useState<LocationObject | null>(null);
   const [region, setRegion] = useState<Region>({
-    latitude: 14.5995, // Default to Manila coordinates
-    longitude: 120.9842,
+    latitude: 14.765, // Default to Barangay 175, Caloocan City
+    longitude: 121.0392,
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   });
@@ -163,6 +163,10 @@ export default function HomeScreen() {
 
     setSelectedMarker(markerData);
     setSheetVisible(true);
+    
+  const handleEdit = (markerData: any) => {
+    console.log('Edit location:', markerData.neighborhoodID);
+    // Implement edit logic here - could open edit form, navigate to edit screen, etc.
   };
 
   return (
@@ -220,8 +224,8 @@ export default function HomeScreen() {
         {/* Add more sample markers */}
         <Marker
           coordinate={{
-            latitude: 14.6020,
-            longitude: 120.9850,
+            latitude: 14.765,
+            longitude: 121.0392,
           }}
           title="Safe Zone"
           description="Evacuation center"
@@ -231,7 +235,7 @@ export default function HomeScreen() {
             longitude: 120.9850,
             neighborhoodID: "Safe Zone Alpha",
             terminalID: "RSQW-001",
-            terminalAddress: "456 Evacuation Center Ave, Barangay Norte",
+            terminalAddress: "Barangay 175 Subdivision, Camarin, Caloocan City North",
             dateRegistered: "August 10, 2023",
             lastUpdatedAt: "September 25, 2023, 12:15",
             type: "safe-zone"
@@ -286,6 +290,7 @@ export default function HomeScreen() {
         onClose={hideBottomSheet}
         onGetDirections={handleGetDirections}
         onMoreInfo={handleMoreInfo}
+        onEdit={handleEdit}
       />
     </ThemedView>
   );

@@ -1,38 +1,47 @@
-import { Geist_100Thin } from '@expo-google-fonts/geist/100Thin';
-import { Geist_200ExtraLight } from '@expo-google-fonts/geist/200ExtraLight';
-import { Geist_300Light } from '@expo-google-fonts/geist/300Light';
-import { Geist_400Regular } from '@expo-google-fonts/geist/400Regular';
-import { Geist_500Medium } from '@expo-google-fonts/geist/500Medium';
-import { Geist_600SemiBold } from '@expo-google-fonts/geist/600SemiBold';
-import { Geist_700Bold } from '@expo-google-fonts/geist/700Bold';
-import { Geist_800ExtraBold } from '@expo-google-fonts/geist/800ExtraBold';
-import { Geist_900Black } from '@expo-google-fonts/geist/900Black';
-import { useFonts } from '@expo-google-fonts/geist/useFonts';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import React from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import '../global.css';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
+// Load Geist fonts
+import {
+  Geist_100Thin,
+  Geist_200ExtraLight,
+  Geist_300Light,
+  Geist_400Regular,
+  Geist_500Medium,
+  Geist_600SemiBold,
+  Geist_700Bold,
+  Geist_800ExtraBold,
+  Geist_900Black,
+} from '@expo-google-fonts/geist';
+
+// This is the root layout component that wraps all pages
+// It's only rendered once when the app starts
+// All other pages will be rendered as children of this component
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
-    let [fontsLoaded] = useFonts({
-    Geist_100Thin, 
-    Geist_200ExtraLight, 
-    Geist_300Light, 
-    Geist_400Regular, 
-    Geist_500Medium, 
-    Geist_600SemiBold, 
-    Geist_700Bold, 
-    Geist_800ExtraBold, 
-    Geist_900Black
+  const [fontsLoaded] = useFonts({
+    'Geist-100': Geist_100Thin as any,
+    'Geist-200': Geist_200ExtraLight as any,
+    'Geist-300': Geist_300Light as any,
+    'Geist-400': Geist_400Regular as any,
+    'Geist-500': Geist_500Medium as any,
+    'Geist-600': Geist_600SemiBold as any,
+    'Geist-700': Geist_700Bold as any,
+    'Geist-800': Geist_800ExtraBold as any,
+    'Geist-900': Geist_900Black as any,
   });
 
+  // Show nothing while fonts are loading
   if (!fontsLoaded) {
     return null;
   }
@@ -41,8 +50,13 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <BottomSheetModalProvider>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack>
+          <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+          <Stack screenOptions={{
+            headerShown: false,
+            animation: 'fade',
+          }}>
             <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="login/index" options={{ headerShown: false }} />
             <Stack.Screen name="verification/index" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
