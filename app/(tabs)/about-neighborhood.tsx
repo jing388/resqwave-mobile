@@ -29,6 +29,18 @@ interface NeighborhoodData {
   floodwaterSubsidence: string;
   floodRelatedHazards: string[];
   notableInfo: string[];
+  focalPerson: {
+    name: string;
+    avatar?: string;
+    contactNo: string;
+    email: string;
+  };
+  alternativeFocalPerson: {
+    name: string;
+    avatar?: string;
+    contactNo: string;
+    email: string;
+  };
 }
 
 interface FloodHazard {
@@ -99,7 +111,17 @@ export default function AboutNeighborhoodScreen() {
         ],
         notableInfo: [
           "Contains multiple residential subdivisions",
-        ]
+        ],
+        focalPerson: {
+          name: "Juan Dela Cruz",
+          contactNo: "+63 912 345 6789",
+          email: "juan.delacruz@resqwave.ph"
+        },
+        alternativeFocalPerson: {
+          name: "Maria Santos",
+          contactNo: "+63 923 456 7890",
+          email: "maria.santos@resqwave.ph"
+        }
       };
 
       setNeighborhoodData(mockData);
@@ -448,47 +470,48 @@ export default function AboutNeighborhoodScreen() {
     // View mode
     return (
       <>
-        {/* About the Neighborhood & Population - Merged Section */}
-        <View className="px-6 mb-4">
-          <View className="gap-4 mb-2">
-            
-            {/* Neighborhood ID */}
-            <DetailRow label="Neighborhood ID" value={neighborhoodData.id} />
-            <Separator />
-
-            {/* Registered At */}
-            <DetailRow label="Registered At" value={neighborhoodData.registeredAt} />
-            <Separator />
-
-            {/* Terminal ID */}
-            <DetailRow label="Terminal ID" value={neighborhoodData.terminalID} />
-            <Separator />
-
-            {/* Terminal Address */}
-            <DetailRow label="Terminal Address" value={neighborhoodData.terminalAddress} />
-            <Separator />
-
-            {/* Coordinates */}
-            <DetailRow label="Coordinates" value={`${neighborhoodData.coordinates.latitude}, ${neighborhoodData.coordinates.longitude}`} />
-            <Separator />
-
-            {/* Approx. Residents */}
-            <DetailRow label="Approximate Number of Residents" value={neighborhoodData.approxResidents.toLocaleString()} />
-            <Separator />
-
-            {/* Avg. Household Size */}
-            <DetailRow label="Approximate Number of Household" value={`${neighborhoodData.avgHouseholdSize} members`} />
-            <Separator />
-
-            {/* Floodwater Subsidence */}
-            <DetailRow label="Floodwater Subsidence" value={neighborhoodData.floodwaterSubsidence} />
-          </View>
-        </View>
-
-        {/* Flood Information */}
+        {/* Neighborhood Information - Consolidated Section */}
         <View className="px-6">
-          <InfoCard title="FLOOD-RELATED HAZARDS ">
-            <View className="mt-4">
+          <InfoCard title="NEIGHBORHOOD INFORMATION">
+            <View className="gap-4 mt-4">
+              
+              {/* Neighborhood ID */}
+              <DetailRow label="Neighborhood ID" value={neighborhoodData.id} />
+              <Separator />
+
+              {/* Registered At */}
+              <DetailRow label="Registered At" value={neighborhoodData.registeredAt} />
+              <Separator />
+
+              {/* Terminal ID */}
+              <DetailRow label="Terminal ID" value={neighborhoodData.terminalID} />
+              <Separator />
+
+              {/* Terminal Address */}
+              <DetailRow label="Terminal Address" value={neighborhoodData.terminalAddress} />
+              <Separator />
+
+              {/* Coordinates */}
+              <DetailRow label="Coordinates" value={`${neighborhoodData.coordinates.latitude}, ${neighborhoodData.coordinates.longitude}`} />
+              <Separator />
+
+              {/* Approx. Residents */}
+              <DetailRow label="Approximate Number of Residents" value={neighborhoodData.approxResidents.toLocaleString()} />
+              <Separator />
+
+              {/* Avg. Household Size */}
+              <DetailRow label="Approximate Number of Household" value={`${neighborhoodData.avgHouseholdSize} members`} />
+              <Separator />
+
+              {/* Floodwater Subsidence */}
+              <DetailRow label="Floodwater Subsidence" value={neighborhoodData.floodwaterSubsidence} />
+            </View>
+
+            {/* Flood-Related Hazards */}
+            <View className="mt-6">
+              <Text className="text-background-muted text-sm font-geist-medium spacing-10 tracking-wide mb-3">
+                FLOOD-RELATED HAZARDS
+              </Text>
               {neighborhoodData.floodRelatedHazards.map((hazard: string, index: number) => (
                 <View key={index} className="flex-row mb-2">
                   <Text className="text-white text-md font-geist-regular mr-2">•</Text>
@@ -498,13 +521,12 @@ export default function AboutNeighborhoodScreen() {
                 </View>
               ))}
             </View>
-          </InfoCard>
-        </View>
 
-        {/* Other Notable Information */}
-        <View className="px-6 mb-8">
-          <InfoCard title="OTHER NOTABLE INFORMATION">
+            {/* Other Notable Information */}
             <View className="mt-4">
+              <Text className="text-background-muted text-sm font-geist-medium spacing-10 tracking-wide mb-3">
+                OTHER NOTABLE INFORMATION
+              </Text>
               {neighborhoodData.notableInfo.map((info: string, index: number) => (
                 <View key={index} className="flex-row mb-2">
                   <Text className="text-white text-md font-geist-regular mr-2">•</Text>
@@ -513,6 +535,25 @@ export default function AboutNeighborhoodScreen() {
                   </Text>
                 </View>
               ))}
+            </View>
+          </InfoCard>
+        </View>
+
+        {/* Focal Person Information */}
+        <View className="px-6 mb-2">
+          <InfoCard title="FOCAL PERSON">
+            <View className="gap-4 mt-4">
+              <DetailRow label="Focal Person" value={neighborhoodData.focalPerson.name} />
+              <Separator />
+              <DetailRow label="Contact No." value={neighborhoodData.focalPerson.contactNo} />
+              <Separator />
+              <DetailRow label="Email" value={neighborhoodData.focalPerson.email} />
+              <Separator />
+              <DetailRow label="Alternative Focal Person" value={neighborhoodData.alternativeFocalPerson.name} />
+              <Separator />
+              <DetailRow label="Contact No." value={neighborhoodData.alternativeFocalPerson.contactNo} />
+              <Separator />
+              <DetailRow label="Email" value={neighborhoodData.alternativeFocalPerson.email} />
             </View>
           </InfoCard>
         </View>
@@ -666,30 +707,42 @@ export default function AboutNeighborhoodScreen() {
             scrollEventThrottle={16}
             onScroll={scrollHandler}
           >
+            {/* Header Section */}
+            <View className="px-6 py-6">
+              <Text className="text-white text-3xl font-geist-bold mb-2">
+                About Your Neighborhood
+              </Text>
+              <Text className="text-gray-400 text-base font-geist-regular">
+                View and manage neighborhood information
+              </Text>
+            </View>
+
             {/* Normal Header Section - Looks like part of content */}
-            <View className="px-6 py-4">
-              <View className="flex-row items-center gap-3 mb-4">
-                <View className="bg-gray-700 rounded-lg p-3">
-                  <Radio size={22} color="#ffffff" />
+            <View className="px-6 pb-4">
+              <View className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+                <View className="flex-row items-center gap-3">
+                  <View className="bg-gray-700 rounded-lg p-3">
+                    <Radio size={22} color="#ffffff" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-white text-2xl font-geist-semibold">
+                      {neighborhoodData.name}
+                    </Text>
+                    <Text className="text-gray-400 text-sm font-geist-regular mt-1">
+                      {neighborhoodData.coordinates.latitude}, {neighborhoodData.coordinates.longitude}
+                    </Text>
+                  </View>
+                  {/* Edit Button */}
+                  {!isEditMode && (
+                    <TouchableOpacity
+                      className="bg-blue-500 rounded-lg p-3"
+                      onPress={handleEditPress}
+                      activeOpacity={0.7}
+                    >
+                      <Pencil size={20} color="#ffffff" />
+                    </TouchableOpacity>
+                  )}
                 </View>
-                <View className="flex-1">
-                  <Text className="text-white text-2xl font-geist-semibold">
-                    {neighborhoodData.name}
-                  </Text>
-                  <Text className="text-gray-400 text-sm font-geist-regular mt-1">
-                    {neighborhoodData.coordinates.latitude}, {neighborhoodData.coordinates.longitude}
-                  </Text>
-                </View>
-                {/* Edit Button */}
-                {!isEditMode && (
-                  <TouchableOpacity
-                    className="bg-blue-500 rounded-lg p-3"
-                    onPress={handleEditPress}
-                    activeOpacity={0.7}
-                  >
-                    <Pencil size={20} color="#ffffff" />
-                  </TouchableOpacity>
-                )}
               </View>
             </View>
 
@@ -697,7 +750,7 @@ export default function AboutNeighborhoodScreen() {
             {renderContent()}
 
             {/* Footer */}
-            <View className="px-6 pb-8">
+            <View className="px-6 pb-6">
               <Text className="text-gray-500 text-xs font-geist-regular text-center">
                 Data last updated: {formatDate(neighborhoodData.lastUpdatedAt)}
               </Text>
