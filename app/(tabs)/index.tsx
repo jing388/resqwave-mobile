@@ -163,7 +163,8 @@ export default function HomeScreen() {
 
     setSelectedMarker(markerData);
     setSheetVisible(true);
-    
+  };
+
   const handleEdit = (markerData: any) => {
     console.log('Edit location:', markerData.neighborhoodID);
     // Implement edit logic here - could open edit form, navigate to edit screen, etc.

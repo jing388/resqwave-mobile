@@ -30,15 +30,15 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   const [fontsLoaded] = useFonts({
-    'Geist-100': Geist_100Thin as any,
-    'Geist-200': Geist_200ExtraLight as any,
-    'Geist-300': Geist_300Light as any,
-    'Geist-400': Geist_400Regular as any,
-    'Geist-500': Geist_500Medium as any,
-    'Geist-600': Geist_600SemiBold as any,
-    'Geist-700': Geist_700Bold as any,
-    'Geist-800': Geist_800ExtraBold as any,
-    'Geist-900': Geist_900Black as any,
+    'geist-thin': Geist_100Thin,
+    'geist-extralight': Geist_200ExtraLight,
+    'geist-light': Geist_300Light,
+    'geist-regular': Geist_400Regular,
+    'geist-medium': Geist_500Medium,
+    'geist-semibold': Geist_600SemiBold,
+    'geist-bold': Geist_700Bold,
+    'geist-extrabold': Geist_800ExtraBold,
+    'geist-black': Geist_900Black,
   });
 
   // Show nothing while fonts are loading
@@ -59,7 +59,6 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="login/index" options={{ headerShown: false }} />
             <Stack.Screen name="verification/index" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen 
               name="profile/index" 
               options={{ 

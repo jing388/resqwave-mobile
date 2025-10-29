@@ -5,15 +5,16 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'geist': ['Geist_400Regular', 'system-ui', 'sans-serif'],
-        'geist-thin': ['Geist_100Thin', 'sans-serif'],
-        'geist-extralight': ['Geist_200ExtraLight', 'sans-serif'],
-        'geist-light': ['Geist_300Light', 'sans-serif'],
-        'geist-medium': ['Geist_500Medium', 'sans-serif'],
-        'geist-semibold': ['Geist_600SemiBold', 'sans-serif'],
-        'geist-bold': ['Geist_700Bold', 'sans-serif'],
-        'geist-extrabold': ['Geist_800ExtraBold', 'sans-serif'],
-        'geist-black': ['Geist_900Black', 'sans-serif'],
+        'geist': ['geist-regular', 'system-ui', 'sans-serif'],
+        'geist-regular': ['geist-regular', 'sans-serif'],
+        'geist-thin': ['geist-thin', 'sans-serif'],
+        'geist-extralight': ['geist-extralight', 'sans-serif'],
+        'geist-light': ['geist-light', 'sans-serif'],
+        'geist-medium': ['geist-medium', 'sans-serif'],
+        'geist-semibold': ['geist-semibold', 'sans-serif'],
+        'geist-bold': ['geist-bold', 'sans-serif'],
+        'geist-extrabold': ['geist-extrabold', 'sans-serif'],
+        'geist-black': ['geist-black', 'sans-serif'],
       },
       colors: {
         // Add your custom colors at the root level
