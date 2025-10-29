@@ -21,7 +21,8 @@ module.exports = {
         'background-muted': '#A3A3A3',
         'foreground-muted': '#94A3B8',
         'primary': '#3B82F6',
-        
+        'green': '#2CBE00',
+        // Dark and Light mode colors
         light: {
         'background': '#FFFFFF',
         'background-secondary': '#F8FAFC',

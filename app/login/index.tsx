@@ -108,9 +108,6 @@ export default function LoginScreen() {
               <View className="gap-8 mb-8">
                 {/* Phone Number Input */}
                 <View className="relative">
-                  <Text className="text-gray-400 text-sm font-geist-medium absolute -top-2 left-3 bg-gray-800 px-1 z-10">
-                    Phone Number
-                  </Text>
                   <View className={`flex-row items-center bg-gray-800 rounded-xl border h-16 ${isFocused.phone ? 'border-blue-500' : 'border-gray-600'}`}>
                     <View className="flex-row items-center h-8 px-5 border-r border-gray-600">
                       <Text className="text-gray-50 text-base font-geist-medium mr-2">
@@ -136,9 +133,6 @@ export default function LoginScreen() {
 
                 {/* Password Input */}
                 <View className="relative">
-                  <Text className="text-gray-400 text-sm font-geist-medium absolute -top-2 left-3 bg-gray-800 px-1 z-10">
-                    Password
-                  </Text>
                   <View className={`flex-row items-center bg-gray-800 rounded-xl h-16 px-4 border ${isFocused.password ? 'border-blue-500' : 'border-gray-600'}`}>
                     <TextInput
                       value={password}

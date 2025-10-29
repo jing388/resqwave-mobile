@@ -160,7 +160,7 @@ export default function VerificationScreen() {
                     {[...Array(6)].map((_, index) => (
                       <View 
                         key={index}
-                        className="w-[46] h-[60] rounded-lg bg-green-500 justify-center items-center"
+                        className="w-[46] h-[60] rounded-lg bg-green justify-center items-center"
                       >
                         <Ionicons name="checkmark" size={20} color="white" />
                       </View>

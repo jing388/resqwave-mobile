@@ -1,4 +1,4 @@
-import { FileText } from 'lucide-react-native';
+import { ChevronRight, FileText } from 'lucide-react-native';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
@@ -26,31 +26,25 @@ export function ReportCardContainer({
   };
 
   return (
-    <View className="bg-gray-800/50 rounded-lg border border-gray-700 p-4">
-      {/* Document Header */}
-      <View className="flex-row items-start gap-3 mb-3">
-        <View className="bg-blue-500/20 rounded-lg p-2">
-          <FileText size={20} color="#60A5FA" />
+    <TouchableOpacity 
+      className="bg-gray-800 rounded-xl border border-gray-600 p-4 mb-3"
+      onPress={() => onViewDocument(id, documentName)}
+      activeOpacity={0.7}
+    >
+      <View className="flex-row items-center">
+        <View className="bg-primary/20 rounded-lg p-2 mr-3">
+          <FileText size={20} color="#3B82F6" />
         </View>
         <View className="flex-1">
-          <Text className="text-white text-base font-geist-semibold mb-1">
+          <Text className="text-gray-50 text-base font-geist-medium mb-1">
             {documentName}
           </Text>
-          <Text className="text-gray-400 text-sm font-geist-regular">
+          <Text className="text-gray-400 text-xs font-geist-regular">
             Completed on {formatDate(dateAccomplished)}
           </Text>
         </View>
+        <ChevronRight size={20} color="#9CA3AF" />
       </View>
-
-      {/* View Document Button */}
-      <TouchableOpacity
-        className="bg-blue-500 rounded-lg py-2.5 px-4 self-start"
-        onPress={() => onViewDocument(id, documentName)}
-      >
-        <Text className="text-white text-sm font-geist-semibold">
-          View Document
-        </Text>
-      </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 }

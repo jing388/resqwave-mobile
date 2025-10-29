@@ -1,14 +1,15 @@
 import { Avatar } from '@/components/avatar';
 import { InfoSheet } from '@/components/info-sheet';
 import { LayersButton } from '@/components/layers-button';
+import { Pin } from '@/components/pin';
 import { SearchField } from '@/components/search-field';
 import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { LocationButton } from '@/components/your-location-button';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import type { LocationObject } from 'expo-location';
 import * as Location from 'expo-location';
+import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Dimensions, PermissionsAndroid, Platform, StatusBar, StyleSheet, View } from 'react-native';
 import MapView, { Marker, Region, UrlTile } from 'react-native-maps';
@@ -34,6 +35,25 @@ export default function HomeScreen() {
   });
   const [selectedMarker, setSelectedMarker] = useState<any>(null);
   const [sheetVisible, setSheetVisible] = useState(false);
+  const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
+
+  // Pinned locations data
+  const pinnedLocations = [
+    {
+      id: '1',
+      title: 'N-1',
+      address: '123 Main Street, Barangay Centro',
+      latitude: 14.5995,
+      longitude: 120.9842
+    },
+    {
+      id: '2', 
+      title: 'Safe Zone Alpha',
+      address: '456 Evacuation Center Ave, Barangay Norte',
+      latitude: 14.6020,
+      longitude: 120.9850
+    }
+  ];
 
   // Request location permission
   useEffect(() => {
@@ -85,6 +105,9 @@ export default function HomeScreen() {
   };
 
   const handleMarkerPress = (marker: any) => {
+    // Set active marker for throbbing animation
+    setActiveMarkerId(marker.id || marker.neighborhoodID);
+    
     // Zoom to marker with smooth animation
     mapRef.current?.animateToRegion({
       latitude: marker.latitude,
@@ -101,6 +124,7 @@ export default function HomeScreen() {
   const hideBottomSheet = () => {
     setSheetVisible(false);
     setSelectedMarker(null);
+    setActiveMarkerId(null); // Clear active marker
   };
 
   const handleGetDirections = (markerData: any) => {
@@ -113,6 +137,33 @@ export default function HomeScreen() {
     // Implement more info logic here
   };
 
+  const handleLocationSelect = (location: any) => {
+    // Set active marker for throbbing animation
+    setActiveMarkerId(location.id);
+    
+    // Zoom to selected location
+    mapRef.current?.animateToRegion({
+      latitude: location.latitude,
+      longitude: location.longitude,
+      latitudeDelta: 0.01, // Zoom in closer
+      longitudeDelta: 0.01,
+    }, 1000);
+
+    // Find and show the corresponding marker data
+    const markerData = {
+      latitude: location.latitude,
+      longitude: location.longitude,
+      neighborhoodID: location.title,
+      terminalID: location.id === '1' ? 'TERM-001' : 'RSQW-001',
+      terminalAddress: location.address,
+      dateRegistered: location.id === '1' ? 'September 15, 2023' : 'August 10, 2023',
+      lastUpdatedAt: location.id === '1' ? 'September 25, 2023, 14:30' : 'September 25, 2023, 12:15',
+      type: location.id === '1' ? 'emergency' : 'safe-zone'
+    };
+
+    setSelectedMarker(markerData);
+    setSheetVisible(true);
+    
   const handleEdit = (markerData: any) => {
     console.log('Edit location:', markerData.neighborhoodID);
     // Implement edit logic here - could open edit form, navigate to edit screen, etc.
@@ -145,6 +196,30 @@ export default function HomeScreen() {
         />
         
         {/* Sample Markers */}
+        <Marker
+          coordinate={{
+            latitude: 14.5995,
+            longitude: 120.9842,
+          }}
+          title="Emergency Report"
+          description="Fire incident reported"
+          onPress={() => handleMarkerPress({
+            id: "1",
+            latitude: 14.5995,
+            longitude: 120.9842,
+            neighborhoodID: "N-1",
+            terminalID: "TERM-001",
+            terminalAddress: "123 Main Street, Barangay Centro",
+            dateRegistered: "September 15, 2023",
+            lastUpdatedAt: "September 25, 2023, 14:30",
+            type: "emergency"
+          })}
+        >
+          <Pin 
+            type="emergency" 
+            isActive={activeMarkerId === "1"}
+          />
+        </Marker>
 
         {/* Add more sample markers */}
         <Marker
@@ -155,8 +230,9 @@ export default function HomeScreen() {
           title="Safe Zone"
           description="Evacuation center"
           onPress={() => handleMarkerPress({
-            latitude: 14.765,
-            longitude: 121.0392,
+            id: "2",
+            latitude: 14.6020,
+            longitude: 120.9850,
             neighborhoodID: "Safe Zone Alpha",
             terminalID: "RSQW-001",
             terminalAddress: "Barangay 175 Subdivision, Camarin, Caloocan City North",
@@ -165,12 +241,10 @@ export default function HomeScreen() {
             type: "safe-zone"
           })}
         >
-          <View style={styles.markerContainer}>
-            <View style={[styles.markerPin, { backgroundColor: '#34D399' }]}>
-              <IconSymbol name="checkmark.shield.fill" size={16} color="white" />
-            </View>
-            <View style={[styles.markerArrow, { borderTopColor: '#34D399' }]} />
-          </View>
+          <Pin 
+            type="safe-zone" 
+            isActive={activeMarkerId === "2"}
+          />
         </Marker>
       </MapView>
 
@@ -181,17 +255,16 @@ export default function HomeScreen() {
       >
         <View className="flex-row items-center w-full">
           <SearchField 
-            onPress={() => {
-              // Handle search press - navigate to search screen or open search modal
-              console.log('Search pressed');
-            }}
+            placeholder="Search locations"
+            locations={pinnedLocations}
+            onLocationSelect={handleLocationSelect}
           />
           <Avatar 
             size="md"
             imageSource={require('@/assets/images/sample-profile-picture.jpg')}
             onPress={() => {
-              // Handle profile press - navigate to profile screen
-              console.log('Profile pressed');
+              // Navigate to profile screen
+              router.push('/profile');
             }}
           />
         </View>
@@ -230,28 +303,4 @@ const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
   },
-  markerContainer: {
-    alignItems: 'center',
-  } as const,
-  markerPin: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#FF3B30',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: 'white',
-  } as const,
-  markerArrow: {
-    width: 0,
-    height: 0,
-    marginTop: -2,
-    borderLeftWidth: 8,
-    borderRightWidth: 8,
-    borderTopWidth: 10,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderTopColor: '#FF3B30',
-  } as const,
 });
