@@ -243,14 +243,23 @@ export default function AboutNeighborhoodScreen() {
     }));
   };
 
-  const DetailRow = ({ label, value }: { label: string; value: string | number }) => (
+  const DetailRow = ({ label, value, showAvatar }: { label: string; value: string | number; showAvatar?: boolean }) => (
     <View className="flex-row justify-between gap-4">
       <Text className="text-white text-base font-geist-medium flex-shrink-0" style={{ width: '35%' }}>
         {label}
       </Text>
-      <Text className="text-white text-base font-geist-regular flex-1 text-right">
-        {value}
-      </Text>
+      <View className="flex-1 flex-row items-center justify-end gap-2">
+        {showAvatar && (
+          <View className="w-6 h-6 rounded-full bg-gray-600 items-center justify-center">
+            <Text className="text-white text-xs font-geist-semibold">
+              {String(value).charAt(0).toUpperCase()}
+            </Text>
+          </View>
+        )}
+        <Text className="text-white text-base font-geist-regular text-right">
+          {value}
+        </Text>
+      </View>
     </View>
   );
 
@@ -543,13 +552,13 @@ export default function AboutNeighborhoodScreen() {
         <View className="px-6 mb-2">
           <InfoCard title="FOCAL PERSON">
             <View className="gap-4 mt-4">
-              <DetailRow label="Focal Person" value={neighborhoodData.focalPerson.name} />
+              <DetailRow label="Focal Person" value={neighborhoodData.focalPerson.name} showAvatar={true} />
               <Separator />
               <DetailRow label="Contact No." value={neighborhoodData.focalPerson.contactNo} />
               <Separator />
               <DetailRow label="Email" value={neighborhoodData.focalPerson.email} />
               <Separator />
-              <DetailRow label="Alternative Focal Person" value={neighborhoodData.alternativeFocalPerson.name} />
+              <DetailRow label="Alternative Focal Person" value={neighborhoodData.alternativeFocalPerson.name} showAvatar={true} />
               <Separator />
               <DetailRow label="Contact No." value={neighborhoodData.alternativeFocalPerson.contactNo} />
               <Separator />
@@ -670,7 +679,7 @@ export default function AboutNeighborhoodScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-black" edges={['top', 'left', 'right']}>
+    <SafeAreaView className="flex-1 bg-[#1F2937]" edges={['top', 'left', 'right']}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
 
       {/* Gradient Background */}
@@ -719,30 +728,37 @@ export default function AboutNeighborhoodScreen() {
 
             {/* Normal Header Section - Looks like part of content */}
             <View className="px-6 pb-4">
-              <View className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-                <View className="flex-row items-center gap-3">
-                  <View className="bg-gray-700 rounded-lg p-3">
-                    <Radio size={22} color="#ffffff" />
+              <View className="rounded-xl overflow-hidden border border-gray-700">
+                <LinearGradient
+                  colors={['#2A426B', '#335082']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  className="p-4"
+                >
+                  <View className="flex-row items-center gap-3">
+                    <View className="bg-white-700 rounded-lg p-3">
+                      <Radio size={22} color="#ffffff" />
+                    </View>
+                    <View className="flex-1">
+                      <Text className="text-white text-2xl font-geist-semibold">
+                        {neighborhoodData.name}
+                      </Text>
+                      <Text className="text-gray-400 text-sm font-geist-regular mt-1">
+                        {neighborhoodData.coordinates.latitude}, {neighborhoodData.coordinates.longitude}
+                      </Text>
+                    </View>
+                    {/* Edit Button */}
+                    {!isEditMode && (
+                      <TouchableOpacity
+                        className="bg-blue-500 rounded-lg p-3"
+                        onPress={handleEditPress}
+                        activeOpacity={0.7}
+                      >
+                        <Pencil size={20} color="#ffffff" />
+                      </TouchableOpacity>
+                    )}
                   </View>
-                  <View className="flex-1">
-                    <Text className="text-white text-2xl font-geist-semibold">
-                      {neighborhoodData.name}
-                    </Text>
-                    <Text className="text-gray-400 text-sm font-geist-regular mt-1">
-                      {neighborhoodData.coordinates.latitude}, {neighborhoodData.coordinates.longitude}
-                    </Text>
-                  </View>
-                  {/* Edit Button */}
-                  {!isEditMode && (
-                    <TouchableOpacity
-                      className="bg-blue-500 rounded-lg p-3"
-                      onPress={handleEditPress}
-                      activeOpacity={0.7}
-                    >
-                      <Pencil size={20} color="#ffffff" />
-                    </TouchableOpacity>
-                  )}
-                </View>
+                </LinearGradient>
               </View>
             </View>
 
