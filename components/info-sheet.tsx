@@ -1,4 +1,5 @@
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Pencil, Radio } from 'lucide-react-native';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -82,9 +83,15 @@ export function InfoSheet({
       handleIndicatorStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}
       backgroundStyle={{ backgroundColor: 'transparent' }}
     >
-      <BottomSheetView className="bg-background flex-1 p-6">
-        {/* Handle bar */}
-        <View className="w-12 h-1 bg-white/30 rounded-full self-center mb-6" />
+      <BottomSheetView className="flex-1">
+        <LinearGradient
+          colors={['#1F2937', '#171717']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          className="flex-1 p-6"
+        >
+          {/* Handle bar */}
+          <View className="w-12 h-1 bg-white/30 rounded-full self-center mb-6" />
         
         {/* Content */}
         <View className="gap-4 mb-2">
@@ -123,6 +130,7 @@ export function InfoSheet({
           {/* Last Updated At */}
           <DetailRow label="Last Updated At" value={markerData.lastUpdatedAt} />
         </View>
+        </LinearGradient>
       </BottomSheetView>
     </BottomSheet> 
   );

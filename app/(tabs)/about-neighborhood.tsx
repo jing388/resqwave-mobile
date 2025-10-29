@@ -1,52 +1,127 @@
+import { Dropdown } from '@/components/dropdown';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useState } from 'react';
-import { Modal, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Check, Pencil, Radio, X } from 'lucide-react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue
+} from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Radio, Check, X, ChevronDown } from 'lucide-react-native';
+
+interface NeighborhoodData {
+  id: string;
+  name: string;
+  registeredAt: string;
+  lastUpdatedAt: string;
+  terminalID: string;
+  terminalAddress: string;
+  coordinates: {
+    latitude: number;
+    longitude: number;
+  };
+  approxHouseholds: number;
+  approxResidents: number;
+  avgHouseholdSize: number;
+  floodwaterSubsidence: string;
+  floodRelatedHazards: string[];
+  notableInfo: string[];
+}
+
+interface FloodHazard {
+  label: string;
+  checked: boolean;
+}
 
 export default function AboutNeighborhoodScreen() {
   const [isEditMode, setIsEditMode] = useState(false);
-  const [lastUpdatedDate, setLastUpdatedDate] = useState("September 25, 2023");
+  const [isLoading, setIsLoading] = useState(true);
+  const [neighborhoodData, setNeighborhoodData] = useState<NeighborhoodData | null>(null);
+  
+  // Reanimated values for header
+  const scrollY = useSharedValue(0);
+  const HEADER_HEIGHT = 100;
 
-  // Dropdown modal state
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedDropdown, setSelectedDropdown] = useState<{
-    label: string;
-    value: string | number;
-    options: string[];
-    onChange: (value: string) => void;
-  } | null>(null);
+  // Available hazard options (this can also come from backend)
+  const availableHazards = [
+    "Strong Water Current (Malakas na agos ng tubig)",
+    "Risk of landslide or erosion (Panganib ng landslide o erosion)",
+    "Drainage overflow or canal blockage (Pag-apaw ng drainage o bara sa kanal)",
+    "Roads became impassable (Mga kalsada ay hindi madaanan)",
+    "Electrical wires or exposed cables (Mga kable o wire na nakalantad)"
+  ];
 
   // Editable data state
   const [editedData, setEditedData] = useState({
-    approxHouseholds: 15800,
-    approxResidents: 71726,
-    floodwaterSubsidence: "2-4 hours",
-    floodRelatedHazards: [
-      { label: "Strong Water Current (Malakas na agos ng tubig)", checked: true },
-      { label: "Risk of landslide or erosion (Panganib ng landslide o erosion)", checked: false },
-      { label: "Drainage overflow or canal blockage (Pag-apaw ng drainage o bara sa kanal)", checked: true },
-      { label: "Roads became impassable (Mga kalsada ay hindi madaanan)", checked: false },
-      { label: "Electrical wires or exposed cables (Mga kable o wire na nakalantad)", checked: true }
-    ],
-    notableInfo: "Located in Camarin area, North Caloocan\nContains multiple residential subdivisions\nPart of flood-prone zone in Metro Manila\nWell-connected to public transportation\nGrowing commercial area with local markets"
+    approxHouseholds: 0,
+    approxResidents: 0,
+    avgHouseholdSize: 0,
+    floodwaterSubsidence: "",
+    floodRelatedHazards: [] as FloodHazard[],
+    notableInfo: ""
   });
 
-  // Mock data for Node N-16
-  const neighborhoodData = {
-    name: "N-16",
-    registeredAt: "August 10, 2023",
-    terminalID: "RSQW-001",
-    terminalAddress: "Barangay 175 Subdivision, Camarin, Caloocan City North",
-    coordinates: {
-      latitude: 14.765,
-      longitude: 121.0392
-    },
-    approxHouseholds: editedData.approxHouseholds,
-    approxResidents: editedData.approxResidents,
-    floodwaterSubsidence: editedData.floodwaterSubsidence,
-    floodRelatedHazards: editedData.floodRelatedHazards.filter(h => h.checked).map(h => h.label.split(' (')[0]),
-    notableInfo: editedData.notableInfo.split('\n')
+  // Fetch neighborhood data from backend
+  useEffect(() => {
+    fetchNeighborhoodData();
+  }, []);
+
+  const fetchNeighborhoodData = async () => {
+    try {
+      setIsLoading(true);
+      // TODO: Replace with actual API call
+      // const response = await fetch(`${API_URL}/neighborhoods/${neighborhoodId}`);
+      // const data = await response.json();
+      
+      // Mock data - replace with actual API response
+      const mockData: NeighborhoodData = {
+        id: "N-16",
+        name: "N-16",
+        registeredAt: "August 10, 2023",
+        lastUpdatedAt: "September 25, 2023",
+        terminalID: "RSQW-001",
+        terminalAddress: "Barangay 175 Subdivision, Camarin, Caloocan City North",
+        coordinates: {
+          latitude: 14.765,
+          longitude: 121.0392
+        },
+        approxHouseholds: 15800,
+        approxResidents: 71726,
+        avgHouseholdSize: 4.5,
+        floodwaterSubsidence: "2-4 hours",
+        floodRelatedHazards: [
+          "Strong Water Current (Malakas na agos ng tubig)",
+          "Drainage overflow or canal blockage (Pag-apaw ng drainage o bara sa kanal)",
+          "Electrical wires or exposed cables (Mga kable o wire na nakalantad)"
+        ],
+        notableInfo: [
+          "Contains multiple residential subdivisions",
+        ]
+      };
+
+      setNeighborhoodData(mockData);
+      
+      // Initialize edited data with fetched data
+      setEditedData({
+        approxHouseholds: mockData.approxHouseholds,
+        approxResidents: mockData.approxResidents,
+        avgHouseholdSize: mockData.avgHouseholdSize,
+        floodwaterSubsidence: mockData.floodwaterSubsidence,
+        floodRelatedHazards: availableHazards.map(hazard => ({
+          label: hazard,
+          checked: mockData.floodRelatedHazards.some(h => hazard.includes(h) || h.includes(hazard.split(' (')[0]))
+        })),
+        notableInfo: mockData.notableInfo.join('\n')
+      });
+    } catch (error) {
+      console.error('Error fetching neighborhood data:', error);
+      // TODO: Show error message to user
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Handler functions
@@ -56,46 +131,77 @@ export default function AboutNeighborhoodScreen() {
 
   const handleCancelEdit = () => {
     setIsEditMode(false);
-    // Reset edited data to original values
-    setEditedData({
-      approxHouseholds: 15800,
-      approxResidents: 71726,
-      floodwaterSubsidence: "2-4 hours",
-      floodRelatedHazards: [
-        { label: "Strong Water Current (Malakas na agos ng tubig)", checked: true },
-        { label: "Risk of landslide or erosion (Panganib ng landslide o erosion)", checked: false },
-        { label: "Drainage overflow or canal blockage (Pag-apaw ng drainage o bara sa kanal)", checked: true },
-        { label: "Roads became impassable (Mga kalsada ay hindi madaanan)", checked: false },
-        { label: "Electrical wires or exposed cables (Mga kable o wire na nakalantad)", checked: true }
-      ],
-      notableInfo: "Located in Camarin area, North Caloocan\nContains multiple residential subdivisions\nPart of flood-prone zone in Metro Manila\nWell-connected to public transportation\nGrowing commercial area with local markets"
-    });
+    // Reset edited data to original values from fetched data
+    if (neighborhoodData) {
+      setEditedData({
+        approxHouseholds: neighborhoodData.approxHouseholds,
+        approxResidents: neighborhoodData.approxResidents,
+        avgHouseholdSize: neighborhoodData.avgHouseholdSize,
+        floodwaterSubsidence: neighborhoodData.floodwaterSubsidence,
+        floodRelatedHazards: availableHazards.map(hazard => ({
+          label: hazard,
+          checked: neighborhoodData.floodRelatedHazards.some(h => hazard.includes(h) || h.includes(hazard.split(' (')[0]))
+        })),
+        notableInfo: neighborhoodData.notableInfo.join('\n')
+      });
+    }
   };
 
-  const handleSubmitEdit = () => {
-    console.log('Submitting edited data:', editedData);
+  const handleSubmitEdit = async () => {
+    try {
+      // Prepare data for API
+      const updatedData = {
+        approxHouseholds: editedData.approxHouseholds,
+        approxResidents: editedData.approxResidents,
+        avgHouseholdSize: editedData.avgHouseholdSize,
+        floodwaterSubsidence: editedData.floodwaterSubsidence,
+        floodRelatedHazards: editedData.floodRelatedHazards
+          .filter(h => h.checked)
+          .map(h => h.label.split(' (')[0]),
+        notableInfo: editedData.notableInfo.split('\n').filter(line => line.trim() !== '')
+      };
 
-    // Update the last updated date to current time
-    const now = new Date();
-    const formattedDate = now.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-    const formattedTime = now.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-    setLastUpdatedDate(`${formattedDate}, ${formattedTime}`);
+      console.log('Submitting edited data:', updatedData);
 
-    // Here you would typically save to a database or API
-    setIsEditMode(false);
+      // TODO: Replace with actual API call
+      // const response = await fetch(`${API_URL}/neighborhoods/${neighborhoodData?.id}`, {
+      //   method: 'PUT',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     'Authorization': `Bearer ${authToken}`
+      //   },
+      //   body: JSON.stringify(updatedData)
+      // });
+      // 
+      // if (!response.ok) {
+      //   throw new Error('Failed to update neighborhood data');
+      // }
+      //
+      // const result = await response.json();
+
+      // Update local state with new data
+      if (neighborhoodData) {
+        const now = new Date().toISOString();
+        setNeighborhoodData({
+          ...neighborhoodData,
+          ...updatedData,
+          lastUpdatedAt: now
+        });
+      }
+
+      setIsEditMode(false);
+      // TODO: Show success message to user
+    } catch (error) {
+      console.error('Error updating neighborhood data:', error);
+      // TODO: Show error message to user
+    }
   };
 
   const handleDropdownChange = (field: string, value: string) => {
     setEditedData(prev => ({
       ...prev,
-      [field]: field === 'approxHouseholds' || field === 'approxResidents' ? parseInt(value) : value
+      [field]: field === 'approxHouseholds' || field === 'approxResidents' ? parseInt(value) : 
+               field === 'avgHouseholdSize' ? parseFloat(value) : value
     }));
   };
 
@@ -115,56 +221,82 @@ export default function AboutNeighborhoodScreen() {
     }));
   };
 
-  const openDropdown = (label: string, value: string | number, options: string[], onChange: (value: string) => void) => {
-    setSelectedDropdown({ label, value: String(value), options, onChange });
-    setIsDropdownOpen(true);
-  };
-
-  const closeDropdown = () => {
-    setIsDropdownOpen(false);
-    setSelectedDropdown(null);
-  };
-
-  const selectDropdownOption = (value: string) => {
-    if (selectedDropdown) {
-      selectedDropdown.onChange(value);
-    }
-    closeDropdown();
-  };
-
   const DetailRow = ({ label, value }: { label: string; value: string | number }) => (
-    <View className="flex-row justify-between items-start py-3 border-b border-gray-700">
-      <Text className="text-gray-300 text-base font-geist-medium flex-shrink-0 mr-4" style={{ width: '40%' }}>
+    <View className="flex-row justify-between gap-4">
+      <Text className="text-white text-base font-geist-medium flex-shrink-0" style={{ width: '35%' }}>
         {label}
       </Text>
-      <Text className="text-white text-base font-geist-regular flex-1 text-right leading-6">
+      <Text className="text-white text-base font-geist-regular flex-1 text-right">
         {value}
       </Text>
     </View>
   );
 
-  const InfoCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
-    <View className="bg-gray-800/50 rounded-xl p-4 mb-4 border border-gray-700">
-      <Text className="text-white text-lg font-geist-semibold mb-3">{title}</Text>
+  const InfoCard = ({ title, children, className }: { title: string; children: React.ReactNode; className?: string }) => (
+    <View className={`bg-gray-800/50 rounded-xl p-6 mb-4 border border-gray-700 ${className || ''}`}>
+      <Text className="text-background-muted text-sm font-geist-medium spacing-10 tracking-wide">{title}</Text>
       {children}
     </View>
   );
 
+  const Separator = () => <View className="h-[1px] bg-gray-700" />;
+
+  // Dropdown options - can be fetched from backend config
+  const dropdownOptions = {
+    households: [
+      { label: '10,000', value: '10000' },
+      { label: '12,000', value: '12000' },
+      { label: '15,000', value: '15000' },
+      { label: '15,800', value: '15800' },
+      { label: '16,500', value: '16500' },
+      { label: '17,000', value: '17000' },
+      { label: '18,000', value: '18000' },
+      { label: '20,000', value: '20000' }
+    ],
+    residents: [
+      { label: '50,000', value: '50000' },
+      { label: '60,000', value: '60000' },
+      { label: '70,000', value: '70000' },
+      { label: '71,726', value: '71726' },
+      { label: '73,000', value: '73000' },
+      { label: '75,000', value: '75000' },
+      { label: '80,000', value: '80000' },
+      { label: '90,000', value: '90000' }
+    ],
+    householdSize: [
+      { label: '3.0 members', value: '3.0' },
+      { label: '3.5 members', value: '3.5' },
+      { label: '4.0 members', value: '4.0' },
+      { label: '4.5 members', value: '4.5' },
+      { label: '5.0 members', value: '5.0' },
+      { label: '5.5 members', value: '5.5' },
+      { label: '6.0 members', value: '6.0' }
+    ],
+    subsidenceDuration: [
+      { label: 'Less than 1 hour', value: 'Less than 1 hour' },
+      { label: '1-2 hours', value: '1-2 hours' },
+      { label: '2-4 hours', value: '2-4 hours' },
+      { label: '4-6 hours', value: '4-6 hours' },
+      { label: '6-8 hours', value: '6-8 hours' },
+      { label: '8-12 hours', value: '8-12 hours' },
+      { label: 'More than 12 hours', value: 'More than 12 hours' }
+    ]
+  };
+
   const EditableDropdown = ({ label, value, options, onChange }: {
     label: string;
     value: string | number;
-    options: string[];
+    options: { label: string; value: string }[];
     onChange: (value: string) => void;
   }) => (
     <View className="mb-4">
       <Text className="text-gray-300 text-base font-geist-medium mb-2">{label}</Text>
-      <TouchableOpacity
-        className="border border-gray-600 rounded-lg bg-gray-800 px-3 py-3 flex-row justify-between items-center"
-        onPress={() => openDropdown(label, value, options, onChange)}
-      >
-        <Text className="text-white text-base flex-1">{value}</Text>
-        <ChevronDown size={20} color="#60A5FA" />
-      </TouchableOpacity>
+      <Dropdown
+        options={options}
+        selectedValue={String(value)}
+        onValueChange={onChange}
+        placeholder={`Select ${label.toLowerCase()}`}
+      />
     </View>
   );
 
@@ -209,12 +341,14 @@ export default function AboutNeighborhoodScreen() {
 
   // Render content based on edit mode
   const renderContent = () => {
+    if (!neighborhoodData) return null;
+
     if (isEditMode) {
       return (
         <>
           {/* Basic Information - Read Only */}
           <View className="px-6 mb-6">
-            <InfoCard title="Basic Information">
+            <InfoCard title="ABOUT THE NEIGHBORHOOD">
               <DetailRow label="Name" value={neighborhoodData.name} />
               <DetailRow label="Registered At" value={neighborhoodData.registeredAt} />
               <DetailRow label="Terminal ID" value={neighborhoodData.terminalID} />
@@ -228,17 +362,22 @@ export default function AboutNeighborhoodScreen() {
             <InfoCard title="Population Statistics">
               <EditableDropdown
                 label="Approx. Households"
-                value={editedData.approxHouseholds.toLocaleString()}
-                options={['15000', '15800', '16500', '17000', '18000']}
+                value={String(editedData.approxHouseholds)}
+                options={dropdownOptions.households}
                 onChange={(value) => handleDropdownChange('approxHouseholds', value)}
               />
               <EditableDropdown
-                label="Approx. Residents"
-                value={editedData.approxResidents.toLocaleString()}
-                options={['70000', '71726', '73000', '75000', '80000']}
+                label="Approx. No. of Residents"
+                value={String(editedData.approxResidents)}
+                options={dropdownOptions.residents}
                 onChange={(value) => handleDropdownChange('approxResidents', value)}
               />
-              <DetailRow label="Avg. Household Size" value="4.5 members" />
+              <EditableDropdown
+                label="Avg. Household Size"
+                value={String(editedData.avgHouseholdSize)}
+                options={dropdownOptions.householdSize}
+                onChange={(value) => handleDropdownChange('avgHouseholdSize', value)}
+              />
             </InfoCard>
           </View>
 
@@ -248,7 +387,7 @@ export default function AboutNeighborhoodScreen() {
               <EditableDropdown
                 label="Floodwater Subsidence Duration"
                 value={editedData.floodwaterSubsidence}
-                options={['1-2 hours', '2-4 hours', '4-6 hours', '6-8 hours', '8+ hours']}
+                options={dropdownOptions.subsidenceDuration}
                 onChange={(value) => handleDropdownChange('floodwaterSubsidence', value)}
               />
 
@@ -309,37 +448,54 @@ export default function AboutNeighborhoodScreen() {
     // View mode
     return (
       <>
-        {/* Basic Information */}
-        <View className="px-6 mb-6">
-          <InfoCard title="Basic Information">
-            <DetailRow label="Name" value={neighborhoodData.name} />
-            <DetailRow label="Registered At" value={neighborhoodData.registeredAt} />
-            <DetailRow label="Terminal ID" value={neighborhoodData.terminalID} />
-            <DetailRow label="Terminal Address" value={neighborhoodData.terminalAddress} />
-            <DetailRow label="Coordinates" value={`${neighborhoodData.coordinates.latitude}, ${neighborhoodData.coordinates.longitude}`} />
-          </InfoCard>
-        </View>
+        {/* About the Neighborhood & Population - Merged Section */}
+        <View className="px-6 mb-4">
+          <View className="gap-4 mb-2">
+            
+            {/* Neighborhood ID */}
+            <DetailRow label="Neighborhood ID" value={neighborhoodData.id} />
+            <Separator />
 
-        {/* Population Statistics */}
-        <View className="px-6 mb-6">
-          <InfoCard title="Population Statistics">
-            <DetailRow label="Approx. Households" value={neighborhoodData.approxHouseholds.toLocaleString()} />
-            <DetailRow label="Approx. Residents" value={neighborhoodData.approxResidents.toLocaleString()} />
-            <DetailRow label="Avg. Household Size" value="4.5 members" />
-          </InfoCard>
+            {/* Registered At */}
+            <DetailRow label="Registered At" value={neighborhoodData.registeredAt} />
+            <Separator />
+
+            {/* Terminal ID */}
+            <DetailRow label="Terminal ID" value={neighborhoodData.terminalID} />
+            <Separator />
+
+            {/* Terminal Address */}
+            <DetailRow label="Terminal Address" value={neighborhoodData.terminalAddress} />
+            <Separator />
+
+            {/* Coordinates */}
+            <DetailRow label="Coordinates" value={`${neighborhoodData.coordinates.latitude}, ${neighborhoodData.coordinates.longitude}`} />
+            <Separator />
+
+            {/* Approx. Residents */}
+            <DetailRow label="Approximate Number of Residents" value={neighborhoodData.approxResidents.toLocaleString()} />
+            <Separator />
+
+            {/* Avg. Household Size */}
+            <DetailRow label="Approximate Number of Household" value={`${neighborhoodData.avgHouseholdSize} members`} />
+            <Separator />
+
+            {/* Floodwater Subsidence */}
+            <DetailRow label="Floodwater Subsidence" value={neighborhoodData.floodwaterSubsidence} />
+          </View>
         </View>
 
         {/* Flood Information */}
-        <View className="px-6 mb-6">
-          <InfoCard title="Flood Information">
-            <DetailRow label="Floodwater Subsidence" value={neighborhoodData.floodwaterSubsidence} />
-
+        <View className="px-6">
+          <InfoCard title="FLOOD-RELATED HAZARDS ">
             <View className="mt-4">
-              <Text className="text-gray-300 text-base font-geist-medium mb-2">Flood Related Hazards:</Text>
               {neighborhoodData.floodRelatedHazards.map((hazard: string, index: number) => (
-                <Text key={index} className="text-white text-sm font-geist-regular mb-1 leading-5">
-                  • {hazard}
-                </Text>
+                <View key={index} className="flex-row mb-2">
+                  <Text className="text-white text-md font-geist-regular mr-2">•</Text>
+                  <Text className="text-white text-md font-geist-regular flex-1 leading-6">
+                    {hazard}
+                  </Text>
+                </View>
               ))}
             </View>
           </InfoCard>
@@ -347,15 +503,128 @@ export default function AboutNeighborhoodScreen() {
 
         {/* Other Notable Information */}
         <View className="px-6 mb-8">
-          <InfoCard title="Other Notable Information">
-            {neighborhoodData.notableInfo.map((info: string, index: number) => (
-              <Text key={index} className="text-white text-sm font-geist-regular mb-2 leading-5">
-                • {info}
-              </Text>
-            ))}
+          <InfoCard title="OTHER NOTABLE INFORMATION">
+            <View className="mt-4">
+              {neighborhoodData.notableInfo.map((info: string, index: number) => (
+                <View key={index} className="flex-row mb-2">
+                  <Text className="text-white text-md font-geist-regular mr-2">•</Text>
+                  <Text className="text-white text-md font-geist-regular flex-1 leading-6">
+                    {info}
+                  </Text>
+                </View>
+              ))}
+            </View>
           </InfoCard>
         </View>
       </>
+    );
+  };
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  // Scroll handler
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  // Animated Header Component
+  const AnimatedHeader = () => {
+    if (!neighborhoodData) return null;
+
+    // Sticky header background/border style (only shows when scrolled)
+    const stickyHeaderStyle = useAnimatedStyle(() => {
+      const opacity = interpolate(
+        scrollY.value,
+        [0, 80],
+        [0, 1],
+        Extrapolation.CLAMP
+      );
+
+      return {
+        opacity,
+        backgroundColor: '#111827',
+        borderBottomWidth: 1,
+        borderBottomColor: '#374151',
+        paddingVertical: 10,
+      };
+    });
+
+    // Collapsed navbar opacity (fade in when scrolling)
+    const collapsedOpacity = useAnimatedStyle(() => {
+      const opacity = interpolate(
+        scrollY.value,
+        [0, 50],
+        [0, 1],
+        Extrapolation.CLAMP
+      );
+
+      return { opacity };
+    });
+
+    return (
+      <Animated.View 
+        style={[
+          stickyHeaderStyle,
+          {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 10,
+            height: 90,
+          }
+        ]}
+      >
+        {/* Collapsed Navbar Content - Only visible when scrolling */}
+        <Animated.View 
+          style={[
+            collapsedOpacity,
+            {
+              paddingHorizontal: 24,
+              paddingVertical: 20,
+              height: 70,
+            }
+          ]}
+          pointerEvents={scrollY.value > 25 ? 'auto' : 'none'}
+        >
+          <View className="flex-row items-center gap-3">
+            <View className="bg-gray-700 rounded-lg p-3">
+              <Radio size={22} color="#ffffff" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-white text-2xl font-geist-semibold">
+                {neighborhoodData.name}
+              </Text>
+              <Text className="text-gray-400 text-sm font-geist-regular mt-1">
+                {neighborhoodData.coordinates.latitude}, {neighborhoodData.coordinates.longitude}
+              </Text>
+            </View>
+            {!isEditMode && (
+              <TouchableOpacity
+                className="bg-blue-500 rounded-lg p-3"
+                onPress={handleEditPress}
+                activeOpacity={0.7}
+              >
+                <Pencil size={20} color="#ffffff" />
+              </TouchableOpacity>
+            )}
+          </View>
+        </Animated.View>
+      </Animated.View>
     );
   };
 
@@ -369,80 +638,73 @@ export default function AboutNeighborhoodScreen() {
         className="absolute inset-0"
       />
 
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View className="px-6 pt-4 pb-6">
-          <View className="flex-row items-center justify-center gap-3 mb-2">
-            <View className="bg-gray-700 rounded-lg p-3">
-              <Radio size={28} color="#ffffff" />
-            </View>
-            <Text className="text-white text-3xl font-geist-bold">
-              N-16
-            </Text>
-          </View>
-          <Text className="text-gray-400 text-center text-base font-geist-regular">
-            Last Registered: October 25, 2025
+      {isLoading ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#60A5FA" />
+          <Text className="text-gray-400 text-base font-geist-regular mt-4">
+            Loading neighborhood data...
           </Text>
         </View>
-
-        {/* Edit Information Button (only in view mode) */}
-        {!isEditMode && (
-          <View className="px-6 mb-6">
-            <TouchableOpacity
-              className="bg-blue-500 rounded-xl py-4 items-center"
-              onPress={handleEditPress}
-              activeOpacity={0.7}
-            >
-              <Text className="text-white text-lg font-geist-semibold">Edit Information</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* Dynamic Content */}
-        {renderContent()}
-
-        {/* Footer */}
-        <View className="px-6 pb-8">
-          <Text className="text-gray-500 text-xs font-geist-regular text-center">
-            Data last updated: {lastUpdatedDate}
+      ) : !neighborhoodData ? (
+        <View className="flex-1 items-center justify-center px-6">
+          <Text className="text-white text-xl font-geist-semibold mb-2">
+            No Data Available
+          </Text>
+          <Text className="text-gray-400 text-base font-geist-regular text-center">
+            Unable to load neighborhood information
           </Text>
         </View>
-      </ScrollView>
+      ) : (
+        <>
+          {/* Animated Sticky Header */}
+          <AnimatedHeader />
 
-      {/* Dropdown Modal */}
-      <Modal
-        visible={isDropdownOpen}
-        transparent
-        animationType="slide"
-        onRequestClose={closeDropdown}
-      >
-        <View className="flex-1 justify-end bg-black/50">
-          <View className="bg-gray-800 rounded-t-3xl max-h-[60%]">
-            <View className="flex-row justify-between items-center p-6 border-b border-gray-700">
-              <Text className="text-white text-lg font-geist-semibold">
-                {selectedDropdown?.label}
-              </Text>
-              <TouchableOpacity onPress={closeDropdown}>
-                <X size={24} color="#ffffff" />
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView className="px-6 py-2" showsVerticalScrollIndicator={false}>
-              {selectedDropdown?.options.map((option, index) => (
-                <TouchableOpacity
-                  key={index}
-                  className="py-4 border-b border-gray-700"
-                  onPress={() => selectDropdownOption(option)}
-                >
-                  <Text className="text-white text-base font-geist-regular">
-                    {option}
+          <Animated.ScrollView
+            className="flex-1"
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingTop: 0 }}
+            scrollEventThrottle={16}
+            onScroll={scrollHandler}
+          >
+            {/* Normal Header Section - Looks like part of content */}
+            <View className="px-6 py-4">
+              <View className="flex-row items-center gap-3 mb-4">
+                <View className="bg-gray-700 rounded-lg p-3">
+                  <Radio size={22} color="#ffffff" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-white text-2xl font-geist-semibold">
+                    {neighborhoodData.name}
                   </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
+                  <Text className="text-gray-400 text-sm font-geist-regular mt-1">
+                    {neighborhoodData.coordinates.latitude}, {neighborhoodData.coordinates.longitude}
+                  </Text>
+                </View>
+                {/* Edit Button */}
+                {!isEditMode && (
+                  <TouchableOpacity
+                    className="bg-blue-500 rounded-lg p-3"
+                    onPress={handleEditPress}
+                    activeOpacity={0.7}
+                  >
+                    <Pencil size={20} color="#ffffff" />
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+
+            {/* Dynamic Content */}
+            {renderContent()}
+
+            {/* Footer */}
+            <View className="px-6 pb-8">
+              <Text className="text-gray-500 text-xs font-geist-regular text-center">
+                Data last updated: {formatDate(neighborhoodData.lastUpdatedAt)}
+              </Text>
+            </View>
+          </Animated.ScrollView>
+        </>
+      )}
     </SafeAreaView>
   );
 }
