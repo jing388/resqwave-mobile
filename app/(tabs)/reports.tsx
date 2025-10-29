@@ -223,10 +223,10 @@ export default function ReportsScreen() {
             });
             
             return (
-              <View key={monthKey} className="mb-4">
+              <View key={monthKey} className="">
                 {/* Month Header */}
                 <TouchableOpacity
-                  className="flex-row items-center justify-between bg-gray-800 rounded-xl p-4 mb-2"
+                  className="flex-row items-center justify-between bg-gray-800 rounded-xl p-4 mb-3"
                   onPress={() => toggleSection(monthKey)}
                 >
                   <View className="flex-row items-center gap-3">
@@ -246,7 +246,7 @@ export default function ReportsScreen() {
 
                 {/* Collapsible Reports */}
                 <Collapsible collapsed={isCollapsed}>
-                  <View className="gap-3">
+                  <View>
                     {reports.map((report) => (
                       <ReportCardContainer
                         key={report.id}

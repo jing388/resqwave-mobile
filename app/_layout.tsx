@@ -46,6 +46,51 @@ export default function RootLayout() {
             <Stack.Screen name="login/index" options={{ headerShown: false }} />
             <Stack.Screen name="verification/index" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen 
+              name="profile/index" 
+              options={{ 
+                headerShown: false,
+                presentation: 'transparentModal',
+                animation: 'slide_from_right',
+                contentStyle: { backgroundColor: 'transparent' }
+              }} 
+            />
+            <Stack.Screen 
+              name="profile/password" 
+              options={{ 
+                headerShown: false,
+                presentation: 'transparentModal',
+                animation: 'slide_from_right',
+                contentStyle: { backgroundColor: 'transparent' }
+              }} 
+            />
+            <Stack.Screen 
+              name="profile/first-and-last-name" 
+              options={{ 
+                headerShown: false,
+                presentation: 'transparentModal',
+                animation: 'slide_from_right',
+                contentStyle: { backgroundColor: 'transparent' }
+              }} 
+            />
+            <Stack.Screen 
+              name="profile/phone-number" 
+              options={{ 
+                headerShown: false,
+                presentation: 'transparentModal',
+                animation: 'slide_from_right',
+                contentStyle: { backgroundColor: 'transparent' }
+              }} 
+            />
+            <Stack.Screen 
+              name="profile/email" 
+              options={{ 
+                headerShown: false,
+                presentation: 'transparentModal',
+                animation: 'slide_from_right',
+                contentStyle: { backgroundColor: 'transparent' }
+              }} 
+            />
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
           </Stack>
           <StatusBar style="light" hidden />
