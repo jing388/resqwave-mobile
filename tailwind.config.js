@@ -30,6 +30,7 @@ module.exports = {
         'text-secondary': '#BABABA',
         'text-muted': '#94A3B8',
         'text-placeholder': '#6B7280',
+        'text-status-error': '#F87171',
         'card-bg': '#1E293B',
         'card-border': '#334155',
         'input-bg': '#334155',

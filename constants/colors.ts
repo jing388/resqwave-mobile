@@ -19,6 +19,7 @@ export const colors = {
     secondary: '#BABABA',
     muted: '#94A3B8',
     placeholder: '#6B7280',
+    error: '#F87171',
   },
   card: {
     background: '#1E293B',
@@ -27,6 +28,7 @@ export const colors = {
   icon: {
     primary: '#FFFFFF',
     secondary: '#9CA3AF',
+    muted: '#6B7280',
   },
   status: {
     success: '#34D399',

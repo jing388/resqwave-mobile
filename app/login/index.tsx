@@ -1,19 +1,22 @@
 import { BottomButtonContainer } from '@/components/ui/bottom-button-container';
 import CustomButton from '@/components/ui/custom-button';
+import { CustomInput } from '@/components/ui/custom-input';
 import { colors } from '@/constants/colors';
-import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '@/hooks/use-auth';
+import { validateIdentifier, validatePassword } from '@/utils/validation';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { Lock, Mail } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
+  Alert,
   Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   Text,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
@@ -22,34 +25,81 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const { login, isLoading, error, clearError } = useAuth();
+
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [isFocused, setIsFocused] = useState({
-    phone: false,
-    password: false,
-  });
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+  const [errors, setErrors] = useState<{
+    identifier?: string;
+    password?: string;
+  }>({});
 
-  // Check if both fields are filled to enable the button
-  const isFormValid =
-    phoneNumber.trim().length >= 10 && password.trim().length >= 6;
+  const validateForm = (): boolean => {
+    const newErrors: typeof errors = {};
 
-  const handleLogin = () => {
-    if (isFormValid) {
-      // For now, we'll navigate to the verification page
-      // In a real app, you would typically verify credentials first
-      console.log('Navigating to verification page');
-      router.push('/verification');
+    // Validate identifier
+    const identifierValidation = validateIdentifier(identifier);
+    if (!identifier.trim()) {
+      newErrors.identifier = 'Email or phone number is required';
+    } else if (!identifierValidation.isValid) {
+      newErrors.identifier = 'Please enter a valid email or phone number';
+    }
+
+    // Validate password
+    if (!password.trim()) {
+      newErrors.password = 'Password is required';
+    } else if (!validatePassword(password)) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const isFormValid = (): boolean => {
+    const identifierValidation = validateIdentifier(identifier);
+    return identifierValidation.isValid && validatePassword(password);
+  };
+
+  const handleLogin = async () => {
+    // Mark that user has attempted to submit
+    setAttemptedSubmit(true);
+
+    // Clear previous API errors
+    clearError();
+
+    // Validate form
+    if (!validateForm()) {
+      // Validation errors are already set in state
+      // The CustomInput components will display them
+      return;
+    }
+
+    try {
+      const response = await login(identifier, password);
+
+      // Navigate to verification screen with tempToken
+      router.push({
+        pathname: '/verification',
+        params: {
+          tempToken: response.tempToken,
+          identifier: identifier,
+        },
+      });
+    } catch (err: any) {
+      Alert.alert('Login Failed', err.message || 'Please try again');
     }
   };
 
   const handleForgotPassword = () => {
-    // Handle forgot password logic
-    console.log('Forgot password pressed');
+    Alert.alert(
+      'Forgot Password',
+      'Please contact your administrator to reset your password.',
+    );
   };
 
   const handleBack = () => {
-    // Always navigate back to the landing page
     router.replace('/');
   };
 
@@ -60,17 +110,17 @@ export default function LoginScreen() {
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView className="flex-1" edges={['top', 'left', 'right']}>
-        {/* Gradient Background */}
         <LinearGradient
           colors={colors.gradients.background}
           className="absolute inset-0"
         />
 
-        {/* Custom Header */}
+        {/* Header */}
         <View className="flex-row items-center justify-between p-5 pt-0 android:pt-5">
           <TouchableOpacity
             className="w-10 h-10 justify-center items-center"
             onPress={handleBack}
+            disabled={isLoading}
           >
             <Image
               source={require('@/assets/images/left-arrow.png')}
@@ -85,7 +135,6 @@ export default function LoginScreen() {
         <KeyboardAvoidingView
           className="flex-1 relative"
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
         >
           <ScrollView
             contentContainerStyle={{ flexGrow: 1, paddingBottom: 200 }}
@@ -106,88 +155,54 @@ export default function LoginScreen() {
                 </Text>
               </View>
 
+              {/* Global Error Message (from API) */}
+              {error && (
+                <View className="bg-status-error/10 border border-status-error rounded-xl p-4 mb-6">
+                  <Text className="text-status-error text-sm font-geist-regular">
+                    {error}
+                  </Text>
+                </View>
+              )}
+
               {/* Form */}
-              <View className="gap-8 mb-8">
-                {/* Phone Number Input */}
-                <View className="relative">
-                  <View
-                    className={`flex-row items-center bg-card-bg rounded-xl border h-16 ${isFocused.phone ? 'border-brand-primary' : 'border-card-border'}`}
-                  >
-                    <View className="flex-row items-center h-8 px-5 border-r border-card-border">
-                      <Text className="text-text-primary text-base font-geist-medium mr-2">
-                        🇵🇭
-                      </Text>
-                      <Text className="text-text-primary text-base font-geist-medium">
-                        +63
-                      </Text>
-                    </View>
-                    <TextInput
-                      value={phoneNumber}
-                      onChangeText={setPhoneNumber}
-                      onFocus={() =>
-                        setIsFocused((prev) => ({ ...prev, phone: true }))
-                      }
-                      onBlur={() =>
-                        setIsFocused((prev) => ({ ...prev, phone: false }))
-                      }
-                      placeholder="Enter your phone number"
-                      placeholderTextColor={colors.text.placeholder}
-                      keyboardType="phone-pad"
-                      className="flex-1 text-text-primary text-base h-full ml-3 font-geist-regular py-0 pr-3"
-                      maxLength={11}
-                    />
-                  </View>
-                </View>
+              <View className="gap-6 mb-8">
+                <CustomInput
+                  value={identifier}
+                  onChangeText={(text) => {
+                    setIdentifier(text);
+                    // Clear error when user starts typing (only if they've attempted submit)
+                    if (attemptedSubmit) {
+                      setErrors((prev) => ({ ...prev, identifier: undefined }));
+                    }
+                  }}
+                  placeholder="Enter phone number or email"
+                  icon={Mail}
+                  error={attemptedSubmit ? errors.identifier : undefined}
+                  editable={!isLoading}
+                />
 
-                {/* Password Input */}
-                <View className="relative">
-                  <View
-                    className={`flex-row items-center bg-card-bg rounded-xl h-16 px-4 border ${isFocused.password ? 'border-brand-primary' : 'border-card-border'}`}
-                  >
-                    <TextInput
-                      value={password}
-                      onChangeText={setPassword}
-                      onFocus={() =>
-                        setIsFocused((prev) => ({ ...prev, password: true }))
-                      }
-                      onBlur={() =>
-                        setIsFocused((prev) => ({ ...prev, password: false }))
-                      }
-                      placeholder="Enter your password"
-                      placeholderTextColor={colors.text.placeholder}
-                      secureTextEntry={!showPassword}
-                      className="flex-1 text-text-primary text-base h-full pr-2 font-geist-regular py-0"
-                      autoCapitalize="none"
-                    />
-                    <TouchableOpacity
-                      onPress={() => setShowPassword(!showPassword)}
-                      className="p-2"
-                    >
-                      <Text className="text-text-muted text-xs font-geist-semibold uppercase">
-                        {showPassword ? (
-                          <Ionicons
-                            name="eye-off"
-                            size={20}
-                            color={colors.icon.secondary}
-                          />
-                        ) : (
-                          <Ionicons
-                            name="eye"
-                            size={20}
-                            color={colors.icon.secondary}
-                          />
-                        )}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
+                <CustomInput
+                  value={password}
+                  onChangeText={(text) => {
+                    setPassword(text);
+                    // Clear error when user starts typing (only if they've attempted submit)
+                    if (attemptedSubmit) {
+                      setErrors((prev) => ({ ...prev, password: undefined }));
+                    }
+                  }}
+                  placeholder="Enter your password"
+                  icon={Lock}
+                  isPassword
+                  error={attemptedSubmit ? errors.password : undefined}
+                  editable={!isLoading}
+                />
 
-                {/* Forgot Password */}
                 <TouchableOpacity
                   onPress={handleForgotPassword}
-                  className="self-center mt-1 p-2"
+                  className="self-center p-2"
+                  disabled={isLoading}
                 >
-                  <Text className="text-foreground-muted text-md font-geist-medium">
+                  <Text className="text-text-secondary text-md font-geist-regular">
                     Forgot your password?
                   </Text>
                 </TouchableOpacity>
@@ -195,18 +210,19 @@ export default function LoginScreen() {
             </View>
           </ScrollView>
 
-          {/* Fixed Bottom Area */}
+          {/* Fixed Bottom Button - Always Enabled */}
           <BottomButtonContainer>
             <CustomButton
-              title="Login"
+              title={isLoading ? 'Logging in...' : 'Login'}
               onPress={handleLogin}
-              variant={isFormValid ? 'gradient-accent' : 'primary'}
+              variant="gradient-accent"
               size="lg"
               width="full"
-              disabled={!isFormValid}
+              disabled={isLoading} // Only disable during loading
             />
           </BottomButtonContainer>
         </KeyboardAvoidingView>
+
         <StatusBar style="light" />
       </SafeAreaView>
     </TouchableWithoutFeedback>

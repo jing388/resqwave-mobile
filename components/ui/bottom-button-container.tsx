@@ -7,32 +7,31 @@ interface BottomButtonContainerProps {
   children: React.ReactNode;
   className?: string;
   style?: ViewStyle;
-  backgroundColor?: string;
   padding?: number;
   position?: 'absolute' | 'relative';
   addTopBorder?: boolean;
   addShadow?: boolean;
+  bottomOffset?: number; // Additional offset from bottom (in pixels)
 }
 
 export const BottomButtonContainer: React.FC<BottomButtonContainerProps> = ({
   children,
   className = '',
   style,
-  backgroundColor = colors.background.primary,
   padding = 20,
   position = 'absolute',
   addTopBorder = false,
   addShadow = false,
+  bottomOffset = 10,
 }) => {
   const insets = useSafeAreaInsets();
 
   const containerStyle: ViewStyle = {
     padding,
     paddingBottom: Platform.OS === 'ios' ? insets.bottom + 20 : 20,
-    backgroundColor,
     position,
     ...(position === 'absolute' && {
-      bottom: 0,
+      bottom: bottomOffset,
       left: 0,
       right: 0,
     }),
