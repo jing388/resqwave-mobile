@@ -1,8 +1,8 @@
-import { Dropdown } from "@/components/dropdown";
-import { EditedData, NeighborhoodData } from "@/types/neighborhood";
-import { Check, X } from "lucide-react-native";
-import React from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Dropdown } from '@/components/ui/dropdown';
+import { EditedData, NeighborhoodData } from '@/types/neighborhood';
+import { Check, X } from 'lucide-react-native';
+import React from 'react';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 interface DropdownOption {
   label: string;
@@ -74,7 +74,7 @@ const EditableCheckbox = ({
   >
     <View
       className={`w-5 h-5 rounded border-2 mr-3 items-center justify-center ${
-        checked ? "bg-blue-500 border-blue-500" : "border-gray-600 bg-gray-800"
+        checked ? 'bg-blue-500 border-blue-500' : 'border-gray-600 bg-gray-800'
       }`}
     >
       {checked && <Check size={12} color="#ffffff" />}
@@ -151,19 +151,19 @@ export const NeighborhoodEdit: React.FC<NeighborhoodEditProps> = ({
             label="Approx. Households"
             value={String(editedData.approxHouseholds)}
             options={dropdownOptions.households}
-            onChange={(value) => onDropdownChange("approxHouseholds", value)}
+            onChange={(value) => onDropdownChange('approxHouseholds', value)}
           />
           <EditableDropdown
             label="Approx. No. of Residents"
             value={String(editedData.approxResidents)}
             options={dropdownOptions.residents}
-            onChange={(value) => onDropdownChange("approxResidents", value)}
+            onChange={(value) => onDropdownChange('approxResidents', value)}
           />
           <EditableDropdown
             label="Avg. Household Size"
             value={String(editedData.avgHouseholdSize)}
             options={dropdownOptions.householdSize}
-            onChange={(value) => onDropdownChange("avgHouseholdSize", value)}
+            onChange={(value) => onDropdownChange('avgHouseholdSize', value)}
           />
         </InfoCard>
       </View>
@@ -176,7 +176,7 @@ export const NeighborhoodEdit: React.FC<NeighborhoodEditProps> = ({
             value={editedData.floodwaterSubsidence}
             options={dropdownOptions.subsidenceDuration}
             onChange={(value) =>
-              onDropdownChange("floodwaterSubsidence", value)
+              onDropdownChange('floodwaterSubsidence', value)
             }
           />
 

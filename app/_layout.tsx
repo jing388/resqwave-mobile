@@ -1,5 +1,9 @@
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
+} from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -23,9 +27,6 @@ import {
   Geist_900Black,
 } from '@expo-google-fonts/geist';
 
-// This is the root layout component that wraps all pages
-// It's only rendered once when the app starts
-// All other pages will be rendered as children of this component
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
@@ -49,86 +50,87 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <BottomSheetModalProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <ThemeProvider
+          value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+        >
           <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-          <Stack 
+          <Stack
             screenOptions={{
               headerShown: false,
               animation: 'slide_from_right',
-              contentStyle: { backgroundColor: 'transparent' }
+              contentStyle: { backgroundColor: 'transparent' },
             }}
           >
-            <Stack.Screen 
-              name="index" 
-              options={{ 
+            <Stack.Screen
+              name="index"
+              options={{
                 headerShown: false,
                 animation: 'slide_from_right',
-              }} 
+              }}
             />
-            <Stack.Screen 
-              name="(tabs)" 
-              options={{ 
+            <Stack.Screen
+              name="(tabs)"
+              options={{
                 headerShown: false,
                 animation: 'slide_from_right',
-              }} 
+              }}
             />
-            <Stack.Screen 
-              name="login/index" 
-              options={{ 
+            <Stack.Screen
+              name="login/index"
+              options={{
                 headerShown: false,
                 animation: 'slide_from_right',
-              }} 
+              }}
             />
-            <Stack.Screen 
-              name="verification/index" 
-              options={{ 
+            <Stack.Screen
+              name="verification/index"
+              options={{
                 headerShown: false,
                 animation: 'slide_from_right',
-              }} 
+              }}
             />
-            <Stack.Screen 
-              name="profile/index" 
-              options={{ 
-                headerShown: false,
-                presentation: 'transparentModal',
-                animation: 'slide_from_right',
-              }} 
-            />
-            <Stack.Screen 
-              name="profile/password" 
-              options={{ 
+            <Stack.Screen
+              name="profile/index"
+              options={{
                 headerShown: false,
                 presentation: 'transparentModal',
                 animation: 'slide_from_right',
-              }} 
+              }}
             />
-            <Stack.Screen 
-              name="profile/first-and-last-name" 
-              options={{ 
+            <Stack.Screen
+              name="profile/password"
+              options={{
                 headerShown: false,
                 presentation: 'transparentModal',
                 animation: 'slide_from_right',
-              }} 
+              }}
             />
-            <Stack.Screen 
-              name="profile/phone-number" 
-              options={{ 
+            <Stack.Screen
+              name="profile/first-and-last-name"
+              options={{
                 headerShown: false,
                 presentation: 'transparentModal',
                 animation: 'slide_from_right',
-              }} 
+              }}
             />
-            <Stack.Screen 
-              name="profile/email" 
-              options={{ 
+            <Stack.Screen
+              name="profile/phone-number"
+              options={{
                 headerShown: false,
                 presentation: 'transparentModal',
                 animation: 'slide_from_right',
-              }} 
+              }}
             />
-            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+            <Stack.Screen
+              name="profile/email"
+              options={{
+                headerShown: false,
+                presentation: 'transparentModal',
+                animation: 'slide_from_right',
+              }}
+            />
           </Stack>
-          <StatusBar style="light" hidden />
+          <StatusBar style="light" />
         </ThemeProvider>
       </BottomSheetModalProvider>
     </GestureHandlerRootView>

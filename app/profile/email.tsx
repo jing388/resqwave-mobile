@@ -1,4 +1,4 @@
-import CustomButton from '@/components/custom-button';
+import CustomButton from '@/components/ui/custom-button';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -6,15 +6,15 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StatusBar,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StatusBar,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -24,12 +24,12 @@ export default function EditEmailScreen() {
   const colors = Colors[colorScheme];
   const params = useLocalSearchParams();
 
-  const [email, setEmail] = useState(params.email as string || '');
+  const [email, setEmail] = useState((params.email as string) || '');
   const [verificationCode, setVerificationCode] = useState('');
   const [codeSent, setCodeSent] = useState(false);
   const [isFocused, setIsFocused] = useState({
     email: false,
-    code: false
+    code: false,
   });
 
   const handleGoBack = () => {
@@ -53,55 +53,57 @@ export default function EditEmailScreen() {
       // TODO: Verify code and update email in backend
       console.log('Verifying code:', verificationCode);
       console.log('Updating email to:', email);
-      
+
       // Simulate verification
-      Alert.alert(
-        'Success',
-        'Your email has been updated successfully!',
-        [
-          {
-            text: 'OK',
-            onPress: () => router.back()
-          }
-        ]
-      );
+      Alert.alert('Success', 'Your email has been updated successfully!', [
+        {
+          text: 'OK',
+          onPress: () => router.back(),
+        },
+      ]);
     }
   };
 
   return (
     <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-      
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
+
       {/* Backdrop - tap to close */}
-      <TouchableOpacity 
-        style={{ flex: 1 }} 
-        activeOpacity={1} 
+      <TouchableOpacity
+        style={{ flex: 1 }}
+        activeOpacity={1}
         onPress={handleGoBack}
       />
-      
+
       {/* Content - slides from right */}
-      <View style={{ 
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        bottom: 0,
-        width: '100%',
-        shadowOffset: { width: -2, height: 0 },
-        shadowOpacity: 0.25,
-        shadowRadius: 10,
-        elevation: 5,
-      }}>
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          width: '100%',
+          shadowOffset: { width: -2, height: 0 },
+          shadowOpacity: 0.25,
+          shadowRadius: 10,
+          elevation: 5,
+        }}
+      >
         {/* Gradient Background */}
         <LinearGradient
           colors={['#1F2937', '#171717']}
           className="absolute inset-0"
         />
-        
-        <KeyboardAvoidingView 
+
+        <KeyboardAvoidingView
           className="flex-1"
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-          <ScrollView 
+          <ScrollView
             className="flex-1"
             contentContainerStyle={{ flexGrow: 1, paddingBottom: 120 }}
             keyboardShouldPersistTaps="handled"
@@ -110,14 +112,16 @@ export default function EditEmailScreen() {
             {/* Header */}
             <View style={{ paddingTop: insets.top + 16 }} className="px-5">
               <View className="flex-row items-center justify-between mb-8">
-                <TouchableOpacity 
+                <TouchableOpacity
                   onPress={handleGoBack}
                   className="p-2"
                   activeOpacity={0.7}
                 >
                   <ChevronLeft size={24} color="#F9FAFB" />
                 </TouchableOpacity>
-                <Text className="text-white text-xl font-geist-semibold">Edit Email</Text>
+                <Text className="text-white text-xl font-geist-semibold">
+                  Edit Email
+                </Text>
                 <View style={{ width: 40 }} />
               </View>
             </View>
@@ -129,12 +133,18 @@ export default function EditEmailScreen() {
                 <Text className="text-gray-400 text-sm mb-2 font-geist-medium">
                   Email Address
                 </Text>
-                <View className={`bg-gray-800 rounded-xl border h-16 px-4 justify-center ${isFocused.email ? 'border-blue-500' : 'border-gray-600'}`}>
+                <View
+                  className={`bg-gray-800 rounded-xl border h-16 px-4 justify-center ${isFocused.email ? 'border-blue-500' : 'border-gray-600'}`}
+                >
                   <TextInput
                     value={email}
                     onChangeText={setEmail}
-                    onFocus={() => setIsFocused(prev => ({...prev, email: true}))}
-                    onBlur={() => setIsFocused(prev => ({...prev, email: false}))}
+                    onFocus={() =>
+                      setIsFocused((prev) => ({ ...prev, email: true }))
+                    }
+                    onBlur={() =>
+                      setIsFocused((prev) => ({ ...prev, email: false }))
+                    }
                     placeholder="Enter your email address"
                     placeholderTextColor="#6B7280"
                     keyboardType="email-address"
@@ -150,7 +160,7 @@ export default function EditEmailScreen() {
                 <CustomButton
                   title="Send Verification Code"
                   onPress={handleSendCode}
-                  variant={isEmailValid ? "gradient-accent" : "primary"}
+                  variant={isEmailValid ? 'gradient-accent' : 'primary'}
                   size="lg"
                   width="full"
                   disabled={!isEmailValid}
@@ -164,12 +174,18 @@ export default function EditEmailScreen() {
                     <Text className="text-gray-400 text-sm mb-2 font-geist-medium">
                       Verification Code
                     </Text>
-                    <View className={`bg-gray-800 rounded-xl border h-16 px-4 justify-center ${isFocused.code ? 'border-blue-500' : 'border-gray-600'}`}>
+                    <View
+                      className={`bg-gray-800 rounded-xl border h-16 px-4 justify-center ${isFocused.code ? 'border-blue-500' : 'border-gray-600'}`}
+                    >
                       <TextInput
                         value={verificationCode}
                         onChangeText={setVerificationCode}
-                        onFocus={() => setIsFocused(prev => ({...prev, code: true}))}
-                        onBlur={() => setIsFocused(prev => ({...prev, code: false}))}
+                        onFocus={() =>
+                          setIsFocused((prev) => ({ ...prev, code: true }))
+                        }
+                        onBlur={() =>
+                          setIsFocused((prev) => ({ ...prev, code: false }))
+                        }
                         placeholder="Enter 6-digit code"
                         placeholderTextColor="#6B7280"
                         keyboardType="number-pad"
@@ -179,7 +195,7 @@ export default function EditEmailScreen() {
                     </View>
                   </View>
 
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     onPress={handleSendCode}
                     className="self-center"
                   >
@@ -194,18 +210,20 @@ export default function EditEmailScreen() {
 
           {/* Fixed Bottom Button */}
           {codeSent && (
-            <View style={{ 
-              padding: 20, 
-              paddingBottom: Platform.OS === 'ios' ? insets.bottom + 20 : 20,
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0
-            }}>
+            <View
+              style={{
+                padding: 20,
+                paddingBottom: Platform.OS === 'ios' ? insets.bottom + 20 : 20,
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+              }}
+            >
               <CustomButton
                 title="Save Changes"
                 onPress={handleSave}
-                variant={isFormValid ? "gradient-accent" : "primary"}
+                variant={isFormValid ? 'gradient-accent' : 'primary'}
                 size="lg"
                 width="full"
                 disabled={!isFormValid}

@@ -1,5 +1,3 @@
-// Shared types for neighborhood components
-
 export interface NeighborhoodData {
   id: string;
   name: string;

@@ -1,9 +1,17 @@
-import { Dropdown } from '@/components/dropdown';
-import { ReportCardContainer } from '@/components/report-card-container';
+import { ReportCardContainer } from '@/components/reports/report-card-container';
+import { Dropdown } from '@/components/ui/dropdown';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ChevronDown, Search } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Animated, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  Animated,
+  ScrollView,
+  StatusBar,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Collapsible from 'react-native-collapsible';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -11,8 +19,12 @@ export default function ReportsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('all');
   const [selectedYear, setSelectedYear] = useState('2023');
-  const [collapsedSections, setCollapsedSections] = useState<{[key: string]: boolean}>({});
-  const [rotationValues, setRotationValues] = useState<{[key: string]: Animated.Value}>({});
+  const [collapsedSections, setCollapsedSections] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [rotationValues, setRotationValues] = useState<{
+    [key: string]: Animated.Value;
+  }>({});
 
   // Sample data structure
   const sampleReports = {
@@ -21,55 +33,55 @@ export default function ReportsScreen() {
         id: '1',
         documentName: 'Monthly Fire Safety Report',
         dateAccomplished: '2023-10-15',
-        type: 'safety'
+        type: 'safety',
       },
       {
         id: '2',
         documentName: 'Emergency Response Drill Summary',
         dateAccomplished: '2023-10-12',
-        type: 'emergency'
+        type: 'emergency',
       },
       {
         id: '3',
         documentName: 'Equipment Maintenance Log',
         dateAccomplished: '2023-10-08',
-        type: 'maintenance'
-      }
+        type: 'maintenance',
+      },
     ],
     '2023-09': [
       {
         id: '4',
         documentName: 'Quarterly Incident Analysis',
         dateAccomplished: '2023-09-28',
-        type: 'analysis'
+        type: 'analysis',
       },
       {
         id: '5',
         documentName: 'Training Completion Report',
         dateAccomplished: '2023-09-20',
-        type: 'training'
-      }
+        type: 'training',
+      },
     ],
     '2023-08': [
       {
         id: '6',
         documentName: 'Community Outreach Summary',
         dateAccomplished: '2023-08-25',
-        type: 'outreach'
+        type: 'outreach',
       },
       {
         id: '7',
         documentName: 'Resource Allocation Report',
         dateAccomplished: '2023-08-15',
-        type: 'resource'
+        type: 'resource',
       },
       {
         id: '8',
         documentName: 'Weather Impact Assessment',
         dateAccomplished: '2023-08-05',
-        type: 'assessment'
-      }
-    ]
+        type: 'assessment',
+      },
+    ],
   };
 
   const monthOptions = [
@@ -85,22 +97,22 @@ export default function ReportsScreen() {
     { label: 'September', value: '09' },
     { label: 'October', value: '10' },
     { label: 'November', value: '11' },
-    { label: 'December', value: '12' }
+    { label: 'December', value: '12' },
   ];
 
   const yearOptions = [
     { label: '2023', value: '2023' },
     { label: '2022', value: '2022' },
-    { label: '2021', value: '2021' }
+    { label: '2021', value: '2021' },
   ];
 
   const toggleSection = (sectionKey: string) => {
     // Initialize rotation value if it doesn't exist
     if (!rotationValues[sectionKey]) {
       const newRotationValue = new Animated.Value(0); // Start at 0 (collapsed/up)
-      setRotationValues(prev => ({
+      setRotationValues((prev) => ({
         ...prev,
-        [sectionKey]: newRotationValue
+        [sectionKey]: newRotationValue,
       }));
     }
 
@@ -116,9 +128,9 @@ export default function ReportsScreen() {
     }).start();
 
     // Update collapsed state
-    setCollapsedSections(prev => ({
+    setCollapsedSections((prev) => ({
       ...prev,
-      [sectionKey]: willBeCollapsed
+      [sectionKey]: willBeCollapsed,
     }));
   };
 
@@ -130,8 +142,18 @@ export default function ReportsScreen() {
   const formatMonthYear = (key: string) => {
     const [year, month] = key.split('-');
     const monthNames = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
     return `${monthNames[parseInt(month) - 1]} ${year}`;
   };
@@ -140,20 +162,24 @@ export default function ReportsScreen() {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
   return (
     <SafeAreaView className="flex-1 bg-black" edges={['top', 'left', 'right']}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-      
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
+
       {/* Gradient Background */}
       <LinearGradient
         colors={['#1F2937', '#171717']}
         className="absolute inset-0"
       />
-      
+
       {/* Content */}
       <View className="flex-1 px-6">
         {/* Header */}
@@ -206,22 +232,23 @@ export default function ReportsScreen() {
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
           {Object.entries(sampleReports).map(([monthKey, reports]) => {
             const isCollapsed = collapsedSections[monthKey] ?? true; // Default to collapsed (true)
-            
+
             // Initialize rotation value if it doesn't exist
             if (!rotationValues[monthKey]) {
               const newRotationValue = new Animated.Value(0);
-              setRotationValues(prev => ({
+              setRotationValues((prev) => ({
                 ...prev,
-                [monthKey]: newRotationValue
+                [monthKey]: newRotationValue,
               }));
             }
 
-            const rotationValue = rotationValues[monthKey] || new Animated.Value(0);
+            const rotationValue =
+              rotationValues[monthKey] || new Animated.Value(0);
             const rotateInterpolate = rotationValue.interpolate({
               inputRange: [0, 1],
               outputRange: ['180deg', '0deg'], // 180deg = up, 0deg = down
             });
-            
+
             return (
               <View key={monthKey} className="">
                 {/* Month Header */}
@@ -239,7 +266,9 @@ export default function ReportsScreen() {
                       </Text>
                     </View>
                   </View>
-                  <Animated.View style={{ transform: [{ rotate: rotateInterpolate }] }}>
+                  <Animated.View
+                    style={{ transform: [{ rotate: rotateInterpolate }] }}
+                  >
                     <ChevronDown size={20} color="#9CA3AF" />
                   </Animated.View>
                 </TouchableOpacity>
