@@ -1,13 +1,23 @@
-import { Avatar } from '@/components/avatar';
-import ChangeProfileSheet from '@/components/change-profile-sheet';
+import ChangeProfileSheet from '@/components/profile/change-profile-sheet';
+import { Avatar } from '@/components/ui/avatar';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+} from '@gorhom/bottom-sheet';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Camera, ChevronLeft, ChevronRight, Lock } from 'lucide-react-native';
 import React, { useRef, useState } from 'react';
-import { Platform, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Platform,
+  ScrollView,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ProfileScreen() {
@@ -18,11 +28,11 @@ export default function ProfileScreen() {
 
   // User data state
   const [userData, setUserData] = useState({
-    firstName: "Juan",
-    lastName: "Dela Cruz",
-    email: "juan.delacruz@email.com",
-    phone: "+63 912 345 6789",
-    lastPasswordChange: "September 15, 2023"
+    firstName: 'Juan',
+    lastName: 'Dela Cruz',
+    email: 'juan.delacruz@email.com',
+    phone: '+63 912 345 6789',
+    lastPasswordChange: 'September 15, 2023',
   });
 
   const handleGoBack = () => {
@@ -54,8 +64,8 @@ export default function ProfileScreen() {
       pathname: '/profile/first-and-last-name',
       params: {
         firstName: userData.firstName,
-        lastName: userData.lastName
-      }
+        lastName: userData.lastName,
+      },
     });
   };
 
@@ -63,8 +73,8 @@ export default function ProfileScreen() {
     router.push({
       pathname: '/profile/phone-number',
       params: {
-        phone: userData.phone
-      }
+        phone: userData.phone,
+      },
     });
   };
 
@@ -72,8 +82,8 @@ export default function ProfileScreen() {
     router.push({
       pathname: '/profile/email',
       params: {
-        email: userData.email
-      }
+        email: userData.email,
+      },
     });
   };
 
@@ -91,62 +101,71 @@ export default function ProfileScreen() {
   return (
     <BottomSheetModalProvider>
       <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-        <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-        
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
+
         {/* Backdrop - tap to close */}
-        <TouchableOpacity 
-          style={{ flex: 1 }} 
-          activeOpacity={1} 
+        <TouchableOpacity
+          style={{ flex: 1 }}
+          activeOpacity={1}
           onPress={handleGoBack}
         />
-        
+
         {/* Profile Content - slides from right */}
-        <View style={{ 
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          bottom: 0,
-          width: '100%',
-          shadowOffset: { width: -2, height: 0 },
-          shadowOpacity: 0.25,
-          shadowRadius: 10,
-          elevation: 5,
-        }}>
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            bottom: 0,
+            width: '100%',
+            shadowOffset: { width: -2, height: 0 },
+            shadowOpacity: 0.25,
+            shadowRadius: 10,
+            elevation: 5,
+          }}
+        >
           {/* Gradient Background */}
           <LinearGradient
             colors={['#1F2937', '#171717']}
             className="absolute inset-0"
           />
-          
+
           {/* Content */}
-          <ScrollView 
-            className="flex-1 px-5" 
+          <ScrollView
+            className="flex-1 px-5"
             contentContainerStyle={{ paddingBottom: 120 }}
             showsVerticalScrollIndicator={false}
           >
             {/* Back Button and Title */}
             <View style={{ paddingTop: insets.top + 16 }}>
               <View className="flex-row items-center justify-between mb-4">
-                <TouchableOpacity 
+                <TouchableOpacity
                   onPress={handleGoBack}
                   className="p-2"
                   activeOpacity={0.7}
                 >
                   <ChevronLeft size={24} color="#F9FAFB" />
                 </TouchableOpacity>
-                <Text className="text-white text-xl font-geist-semibold">Profile</Text>
+                <Text className="text-white text-xl font-geist-semibold">
+                  Profile
+                </Text>
                 <View style={{ width: 40 }} />
               </View>
 
               <View className="items-center mb-8">
-                <TouchableOpacity onPress={handleAvatarPress} activeOpacity={0.8}>
-                  <Avatar 
+                <TouchableOpacity
+                  onPress={handleAvatarPress}
+                  activeOpacity={0.8}
+                >
+                  <Avatar
                     size="xl"
                     imageSource={require('@/assets/images/sample-profile-picture.jpg')}
                   />
-                  <View 
-                    className="bg-primary absolute bottom-0 right-0 w-10 h-10 rounded-full items-center justify-center"
-                  >
+                  <View className="bg-primary absolute bottom-0 right-0 w-10 h-10 rounded-full items-center justify-center">
                     <Camera size={20} color="white" />
                   </View>
                 </TouchableOpacity>
@@ -158,9 +177,9 @@ export default function ProfileScreen() {
               <Text className="text-background-muted text-sm font-geist-medium mb-4 pl-2 spacing-10 tracking-wide">
                 PERSONAL INFORMATION
               </Text>
-              
+
               {/* Full Name */}
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={handleEditName}
                 className="bg-gray-800 p-4 rounded-xl mb-3 border border-gray-600"
                 activeOpacity={0.7}
@@ -179,7 +198,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
 
               {/* Phone Number */}
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={handleEditPhone}
                 className="bg-gray-800 p-4 rounded-xl mb-3 border border-gray-600"
                 activeOpacity={0.7}
@@ -198,7 +217,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
 
               {/* Email */}
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={handleEditEmail}
                 className="bg-gray-800 p-4 rounded-xl mb-3 border border-gray-600"
                 activeOpacity={0.7}
@@ -222,7 +241,7 @@ export default function ProfileScreen() {
               <Text className="text-background-muted text-sm font-geist-medium mb-4 pl-2 spacing-10 tracking-wide">
                 SECURITY
               </Text>
-              
+
               <TouchableOpacity
                 onPress={handleChangePassword}
                 className="bg-gray-800 p-4 rounded-xl mb-3 border border-gray-600"
@@ -247,14 +266,16 @@ export default function ProfileScreen() {
           </ScrollView>
 
           {/* Fixed Bottom Sign Out Button */}
-          <View style={{ 
-            padding: 20, 
-            paddingBottom: Platform.OS === 'ios' ? insets.bottom + 20 : 20,
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0
-          }}>
+          <View
+            style={{
+              padding: 20,
+              paddingBottom: Platform.OS === 'ios' ? insets.bottom + 20 : 20,
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+            }}
+          >
             <TouchableOpacity
               onPress={handleSignOut}
               className="bg-gray-800 p-4 rounded-xl border border-gray-600"
