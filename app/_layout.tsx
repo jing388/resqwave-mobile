@@ -83,6 +83,13 @@ export default function RootLayout() {
               }}
             />
             <Stack.Screen
+              name="login/forgot-password/find-your-account"
+              options={{
+                headerShown: false,
+                animation: 'slide_from_right',
+              }}
+            />
+            <Stack.Screen
               name="verification/index"
               options={{
                 headerShown: false,

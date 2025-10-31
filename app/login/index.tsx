@@ -93,10 +93,7 @@ export default function LoginScreen() {
   };
 
   const handleForgotPassword = () => {
-    Alert.alert(
-      'Forgot Password',
-      'Please contact your administrator to reset your password.',
-    );
+    router.push('/login/forgot-password/find-your-account');
   };
 
   const handleBack = () => {

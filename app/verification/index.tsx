@@ -1,11 +1,12 @@
+import { BottomButtonContainer } from '@/components/ui/bottom-button-container';
 import CustomButton from '@/components/ui/custom-button';
+import { colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
   Image,
   Keyboard,
   KeyboardAvoidingView,
@@ -105,7 +106,7 @@ export default function VerificationScreen() {
       >
         {/* Gradient Background */}
         <LinearGradient
-          colors={['#1F2937', '#171717']}
+          colors={colors.gradients.background}
           className="absolute inset-0"
         />
 
@@ -118,7 +119,7 @@ export default function VerificationScreen() {
             <Image
               source={require('@/assets/images/left-arrow.png')}
               className="w-6 h-6"
-              style={{ tintColor: 'white' }}
+              style={{ tintColor: colors.icon.primary }}
               resizeMode="contain"
             />
           </TouchableOpacity>
@@ -140,14 +141,18 @@ export default function VerificationScreen() {
               <View className="items-center mb-10">
                 {/* Email Icon */}
                 <View className="w-12 h-12 rounded-full bg-blue-500/10 justify-center items-center mb-5">
-                  <Ionicons name="mail" size={24} color="#3B82F6" />
+                  <Ionicons
+                    name="mail"
+                    size={24}
+                    color={colors.brand.primary}
+                  />
                 </View>
 
                 {/* Title and Description */}
-                <Text className="text-white text-4xl font-geist-semibold text-center mb-4">
+                <Text className="text-text-primary text-4xl font-geist-semibold text-center mb-4">
                   Enter verification code
                 </Text>
-                <Text className="text-background-muted text-md text-center font-geist-regular leading-[2] px-4 mb-[-10]">
+                <Text className="text-text-muted text-md text-center font-geist-regular leading-[2] px-4 mb-[-10]">
                   Please enter the verification code we sent to your registered
                   number/email to continue.
                 </Text>
@@ -165,14 +170,18 @@ export default function VerificationScreen() {
                         key={index}
                         className="w-[46] h-[60] rounded-lg bg-green justify-center items-center"
                       >
-                        <Ionicons name="checkmark" size={20} color="white" />
+                        <Ionicons
+                          name="checkmark"
+                          size={20}
+                          color={colors.icon.primary}
+                        />
                       </View>
                     ))}
                   </Animated.View>
                 ) : (
                   <OtpInput
                     numberOfDigits={6}
-                    focusColor="#3B82F6"
+                    focusColor={colors.brand.primary}
                     focusStickBlinkingDuration={500}
                     onTextChange={handleCodeChange}
                     onFilled={(text) => {
@@ -191,8 +200,10 @@ export default function VerificationScreen() {
                         justifyContent: 'center',
                       },
                       pinCodeContainerStyle: {
-                        backgroundColor: '#1F2937',
-                        borderColor: isCodeComplete ? '#3B82F6' : '#374151',
+                        backgroundColor: colors.background.secondary,
+                        borderColor: isCodeComplete
+                          ? colors.brand.primary
+                          : colors.card.border,
                         borderWidth: 1,
                         borderRadius: 8,
                         width: 46,
@@ -201,16 +212,16 @@ export default function VerificationScreen() {
                       pinCodeTextStyle: {
                         fontSize: 24,
                         fontWeight: 'bold',
-                        color: '#FFFFFF',
+                        color: colors.text.primary,
                       },
                       focusStickStyle: {
-                        backgroundColor: '#3B82F6',
+                        backgroundColor: colors.brand.primary,
                         width: 2,
                         height: 32,
                       },
                       focusedPinCodeContainerStyle: {
-                        borderColor: '#3B82F6',
-                        backgroundColor: '#1F2937',
+                        borderColor: colors.brand.primary,
+                        backgroundColor: colors.background.secondary,
                       },
                     }}
                   />
@@ -219,16 +230,16 @@ export default function VerificationScreen() {
 
               {/* Resend Code */}
               <View className="items-center mt-2">
-                <Text className="text-background-muted text-md text-center font-geist-regular">
+                <Text className="text-text-secondary text-md text-center font-geist-regular">
                   Didn't receive any code?{' '}
                   <Text
-                    className={`${isResendDisabled ? 'text-gray-500' : 'text-primary underline'}`}
+                    className={`${isResendDisabled ? 'text-text-placeholder' : 'text-text-accent underline'}`}
                     onPress={isResendDisabled ? undefined : handleResend}
                   >
                     Resend
                   </Text>
                   {isResendDisabled && (
-                    <Text className="text-background-muted">
+                    <Text className="text-text-placeholder">
                       {' '}
                       ({resendTime}s)
                     </Text>
@@ -239,41 +250,23 @@ export default function VerificationScreen() {
           </ScrollView>
         </KeyboardAvoidingView>
 
-        {/* Fixed Bottom Area */}
-        <View
-          style={{
-            padding: 20,
-            paddingBottom: Platform.OS === 'ios' ? 40 : 20,
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-          }}
-        >
-          <View className="mt-4 mb-2">
-            <CustomButton
-              title={
-                isVerifying
-                  ? 'Verifying...'
-                  : verificationSuccess
-                    ? 'Success!'
-                    : 'Verify'
-              }
-              onPress={handleVerify}
-              variant={isCodeComplete ? 'gradient-accent' : 'primary'}
-              size="lg"
-              width="full"
-              disabled={!isCodeComplete || isVerifying || verificationSuccess}
-            />
-            {isVerifying && (
-              <ActivityIndicator
-                className="absolute right-5 top-1/2"
-                style={{ transform: [{ translateY: -10 }] }}
-                color="white"
-              />
-            )}
-          </View>
-        </View>
+        {/* Fixed Bottom Button */}
+        <BottomButtonContainer>
+          <CustomButton
+            title={
+              isVerifying
+                ? 'Verifying...'
+                : verificationSuccess
+                  ? 'Success!'
+                  : 'Verify'
+            }
+            onPress={handleVerify}
+            variant={isCodeComplete ? 'gradient-accent' : 'primary'}
+            size="lg"
+            width="full"
+            disabled={!isCodeComplete || isVerifying || verificationSuccess}
+          />
+        </BottomButtonContainer>
 
         <StatusBar style="light" />
       </SafeAreaView>

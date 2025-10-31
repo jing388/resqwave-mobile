@@ -26,6 +26,7 @@ module.exports = {
         'app-bg': '#171717',
         'app-bg-secondary': '#1F2937',
         'app-bg-muted': '#A3A3A3',
+        'text-accent': '#3B82F6',
         'text-primary': '#FFFFFF',
         'text-secondary': '#BABABA',
         'text-muted': '#94A3B8',

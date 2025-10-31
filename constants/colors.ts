@@ -15,6 +15,7 @@ export const colors = {
     muted: '#A3A3A3',
   },
   text: {
+    accent: '#3B82F6',
     primary: '#FFFFFF',
     secondary: '#BABABA',
     muted: '#94A3B8',
