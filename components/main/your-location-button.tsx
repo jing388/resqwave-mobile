@@ -7,13 +7,13 @@ interface LocationButtonProps {
   className?: string;
 }
 
-export function LocationButton({ 
+export function LocationButton({
   onPress,
-  className = ""
+  className = '',
 }: LocationButtonProps) {
   return (
     <TouchableOpacity
-      className={`w-12 h-12 rounded-lg bg-background justify-center items-center border border-white/10 ${className}`}
+      className={`w-12 h-12 rounded-lg bg-default-black justify-center items-center border border-white/10 ${className}`}
       onPress={onPress}
       activeOpacity={0.8}
       style={{
@@ -24,10 +24,7 @@ export function LocationButton({
         elevation: 4,
       }}
     >
-      <LocateFixed 
-        size={24} 
-        color="#FFFFFF"
-      />
+      <LocateFixed size={24} color="#FFFFFF" />
     </TouchableOpacity>
   );
 }

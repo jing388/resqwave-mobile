@@ -13,6 +13,7 @@ export const colors = {
     primary: '#171717',
     secondary: '#1F2937',
     muted: '#A3A3A3',
+    green: '#2CBE00',
   },
   text: {
     accent: '#3B82F6',
