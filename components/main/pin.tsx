@@ -2,33 +2,25 @@ import React from 'react';
 import { View } from 'react-native';
 
 interface PinProps {
-  isActive?: boolean;
   type?: 'emergency' | 'safe-zone' | 'default';
   size?: number;
 }
 
-export function Pin({ 
-  isActive = false, 
-  type = 'default', 
-  size = 20 
-}: PinProps) {
+export function Pin({ type = 'default', size = 20 }: PinProps) {
   // Determine colors based on type
   const getColors = () => {
     switch (type) {
       case 'emergency':
         return {
           background: '#FF3B30',
-          range: 'rgba(255, 59, 48, 0.2)'
         };
       case 'safe-zone':
         return {
           background: '#34D399',
-          range: 'rgba(52, 211, 153, 0.2)'
         };
       default:
         return {
           background: '#007AFF',
-          range: 'rgba(0, 122, 255, 0.2)'
         };
     }
   };
@@ -37,23 +29,6 @@ export function Pin({
 
   return (
     <View className="items-center justify-center">
-      {/* Range circle when active */}
-      {isActive && (
-        <View
-          style={{
-            position: 'absolute',
-            width: size * 6, // Range diameter
-            height: size * 6,
-            borderRadius: (size * 6) / 2, // Proper circle calculation
-            backgroundColor: colors.range,
-            borderWidth: 1,
-            borderColor: colors.background,
-            top: -(size * 6 - size) / 2, // Center the range circle
-            left: -(size * 6 - size) / 2,
-          }}
-        />
-      )}
-      
       {/* Main pin - simple circle */}
       <View
         style={{
@@ -76,4 +51,25 @@ export function Pin({
       />
     </View>
   );
+}
+
+// Export helper function to get pin colors (used for Circle component)
+export function getPinColors(type: 'emergency' | 'safe-zone' | 'default') {
+  switch (type) {
+    case 'emergency':
+      return {
+        fill: 'rgba(255, 59, 48, 0.15)',
+        stroke: '#FF3B30',
+      };
+    case 'safe-zone':
+      return {
+        fill: 'rgba(52, 211, 153, 0.15)',
+        stroke: '#34D399',
+      };
+    default:
+      return {
+        fill: 'rgba(0, 122, 255, 0.15)',
+        stroke: '#007AFF',
+      };
+  }
 }

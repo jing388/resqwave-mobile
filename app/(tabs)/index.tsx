@@ -1,6 +1,6 @@
 import { InfoSheet } from '@/components/main/info-sheet';
 import { LayersButton } from '@/components/main/layers-button';
-import { Pin } from '@/components/main/pin';
+import { getPinColors } from '@/components/main/pin';
 import { LocationButton } from '@/components/main/your-location-button';
 import { Avatar } from '@/components/ui/avatar';
 import { SearchField } from '@/components/ui/location-search-field';
@@ -10,7 +10,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import type { LocationObject } from 'expo-location';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Dimensions,
   PermissionsAndroid,
@@ -19,14 +19,29 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import MapView, { Marker, Region, UrlTile } from 'react-native-maps';
+import MapView, { Circle, Marker, Region, UrlTile } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 
 const ASPECT_RATIO = width / height;
-const LATITUDE_DELTA = 0.005; // More zoomed in for subdivision view
+const LATITUDE_DELTA = 0.005;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
+// Marker data interface (this is what you'll get from your database)
+interface MarkerData {
+  id: string;
+  latitude: number;
+  longitude: number;
+  neighborhoodID: string;
+  terminalID: string;
+  terminalAddress: string;
+  dateRegistered: string;
+  lastUpdatedAt: string;
+  type: 'emergency' | 'safe-zone' | 'default';
+  title?: string;
+  description?: string;
+}
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme() || 'light';
@@ -35,32 +50,53 @@ export default function HomeScreen() {
   const colors = Colors[colorScheme];
   const [location, setLocation] = useState<LocationObject | null>(null);
   const [region, setRegion] = useState<Region>({
-    latitude: 14.765, // Default to Barangay 175, Caloocan City
+    latitude: 14.765,
     longitude: 121.0392,
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   });
-  const [selectedMarker, setSelectedMarker] = useState<any>(null);
+  const [selectedMarker, setSelectedMarker] = useState<MarkerData | null>(null);
   const [sheetVisible, setSheetVisible] = useState(false);
   const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
 
-  // Pinned locations data
-  const pinnedLocations = [
+  // Dynamic markers array - THIS IS WHERE YOU'LL PUT YOUR DATABASE DATA
+  const [markers, setMarkers] = useState<MarkerData[]>([
     {
       id: '1',
-      title: 'N-1',
-      address: '123 Main Street, Barangay Centro',
       latitude: 14.5995,
       longitude: 120.9842,
+      neighborhoodID: 'N-1',
+      terminalID: 'TERM-001',
+      terminalAddress: '123 Main Street, Barangay Centro',
+      dateRegistered: 'September 15, 2023',
+      lastUpdatedAt: 'September 25, 2023, 14:30',
+      type: 'emergency',
+      title: 'Emergency Report',
+      description: 'Fire incident reported',
     },
     {
       id: '2',
-      title: 'Safe Zone Alpha',
-      address: '456 Evacuation Center Ave, Barangay Norte',
-      latitude: 14.602,
-      longitude: 120.985,
+      latitude: 14.765,
+      longitude: 121.0392,
+      neighborhoodID: 'Safe Zone Alpha',
+      terminalID: 'RSQW-001',
+      terminalAddress: 'Barangay 175 Subdivision, Camarin, Caloocan City North',
+      dateRegistered: 'August 10, 2023',
+      lastUpdatedAt: 'September 25, 2023, 12:15',
+      type: 'safe-zone',
+      title: 'Safe Zone',
+      description: 'Evacuation center',
     },
-  ];
+  ]);
+
+  // Pinned locations for search (derived from markers)
+  const pinnedLocations = markers.map((marker) => ({
+    id: marker.id,
+    title: marker.neighborhoodID,
+    address: marker.terminalAddress,
+    latitude: marker.latitude,
+    longitude: marker.longitude,
+  }));
 
   // Request location permission
   useEffect(() => {
@@ -81,11 +117,9 @@ export default function HomeScreen() {
         return;
       }
 
-      // Get current location
       const currentLocation = await Location.getCurrentPositionAsync({});
       setLocation(currentLocation);
 
-      // Update map region to current location
       setRegion({
         latitude: currentLocation.coords.latitude,
         longitude: currentLocation.coords.longitude,
@@ -110,22 +144,19 @@ export default function HomeScreen() {
     }
   };
 
-  const handleMarkerPress = (marker: any) => {
-    // Set active marker for throbbing animation
-    setActiveMarkerId(marker.id || marker.neighborhoodID);
+  const handleMarkerPress = (marker: MarkerData) => {
+    setActiveMarkerId(marker.id);
 
-    // Zoom to marker with smooth animation
     mapRef.current?.animateToRegion(
       {
         latitude: marker.latitude,
         longitude: marker.longitude,
-        latitudeDelta: 0.01, // Zoom in closer
+        latitudeDelta: 0.01,
         longitudeDelta: 0.01,
       },
       1000,
     );
 
-    // Show bottom sheet
     setSelectedMarker(marker);
     setSheetVisible(true);
   };
@@ -133,57 +164,27 @@ export default function HomeScreen() {
   const hideBottomSheet = () => {
     setSheetVisible(false);
     setSelectedMarker(null);
-    setActiveMarkerId(null); // Clear active marker
+    setActiveMarkerId(null);
   };
 
-  const handleGetDirections = (markerData: any) => {
+  const handleGetDirections = (markerData: MarkerData) => {
     console.log('Get directions to:', markerData.neighborhoodID);
-    // Implement directions logic here
   };
 
-  const handleMoreInfo = (markerData: any) => {
+  const handleMoreInfo = (markerData: MarkerData) => {
     console.log('More info about:', markerData.neighborhoodID);
-    // Implement more info logic here
   };
 
   const handleLocationSelect = (location: any) => {
-    // Set active marker for throbbing animation
-    setActiveMarkerId(location.id);
-
-    // Zoom to selected location
-    mapRef.current?.animateToRegion(
-      {
-        latitude: location.latitude,
-        longitude: location.longitude,
-        latitudeDelta: 0.01, // Zoom in closer
-        longitudeDelta: 0.01,
-      },
-      1000,
-    );
-
-    // Find and show the corresponding marker data
-    const markerData = {
-      latitude: location.latitude,
-      longitude: location.longitude,
-      neighborhoodID: location.title,
-      terminalID: location.id === '1' ? 'TERM-001' : 'RSQW-001',
-      terminalAddress: location.address,
-      dateRegistered:
-        location.id === '1' ? 'September 15, 2023' : 'August 10, 2023',
-      lastUpdatedAt:
-        location.id === '1'
-          ? 'September 25, 2023, 14:30'
-          : 'September 25, 2023, 12:15',
-      type: location.id === '1' ? 'emergency' : 'safe-zone',
-    };
-
-    setSelectedMarker(markerData);
-    setSheetVisible(true);
+    // Find the marker from our markers array
+    const marker = markers.find((m) => m.id === location.id);
+    if (marker) {
+      handleMarkerPress(marker);
+    }
   };
 
-  const handleEdit = (markerData: any) => {
+  const handleEdit = (markerData: MarkerData) => {
     console.log('Edit location:', markerData.neighborhoodID);
-    // Implement edit logic here - could open edit form, navigate to edit screen, etc.
   };
 
   return (
@@ -193,7 +194,6 @@ export default function HomeScreen() {
         backgroundColor="transparent"
         translucent
       />
-      {/* Map View */}
       <MapView
         ref={mapRef}
         style={styles.map}
@@ -208,7 +208,6 @@ export default function HomeScreen() {
         loadingIndicatorColor={colors.tint}
         loadingBackgroundColor={colors.background}
       >
-        {/* OpenStreetMap Tile Layer */}
         <UrlTile
           urlTemplate="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           maximumZ={19}
@@ -216,56 +215,49 @@ export default function HomeScreen() {
           tileSize={256}
         />
 
-        {/* Sample Markers */}
-        <Marker
-          coordinate={{
-            latitude: 14.5995,
-            longitude: 120.9842,
-          }}
-          title="Emergency Report"
-          description="Fire incident reported"
-          onPress={() =>
-            handleMarkerPress({
-              id: '1',
-              latitude: 14.5995,
-              longitude: 120.9842,
-              neighborhoodID: 'N-1',
-              terminalID: 'TERM-001',
-              terminalAddress: '123 Main Street, Barangay Centro',
-              dateRegistered: 'September 15, 2023',
-              lastUpdatedAt: 'September 25, 2023, 14:30',
-              type: 'emergency',
-            })
-          }
-        >
-          <Pin type="emergency" isActive={activeMarkerId === '1'} />
-        </Marker>
+        {/* Dynamically render all markers and their circles */}
+        {markers.map((marker) => {
+          const colors = getPinColors(marker.type);
+          // Get marker color based on type
+          const getMarkerColor = () => {
+            switch (marker.type) {
+              case 'emergency':
+                return '#FF3B30';
+              case 'safe-zone':
+                return '#34D399';
+              default:
+                return '#007AFF';
+            }
+          };
 
-        {/* Add more sample markers */}
-        <Marker
-          coordinate={{
-            latitude: 14.765,
-            longitude: 121.0392,
-          }}
-          title="Safe Zone"
-          description="Evacuation center"
-          onPress={() =>
-            handleMarkerPress({
-              id: '2',
-              latitude: 14.602,
-              longitude: 120.985,
-              neighborhoodID: 'Safe Zone Alpha',
-              terminalID: 'RSQW-001',
-              terminalAddress:
-                'Barangay 175 Subdivision, Camarin, Caloocan City North',
-              dateRegistered: 'August 10, 2023',
-              lastUpdatedAt: 'September 25, 2023, 12:15',
-              type: 'safe-zone',
-            })
-          }
-        >
-          <Pin type="safe-zone" isActive={activeMarkerId === '2'} />
-        </Marker>
+          return (
+            <React.Fragment key={marker.id}>
+              {/* Range Circle - only show if this marker is active */}
+              {activeMarkerId === marker.id && (
+                <Circle
+                  center={{
+                    latitude: marker.latitude,
+                    longitude: marker.longitude,
+                  }}
+                  radius={100}
+                  fillColor={colors.fill}
+                  strokeColor={colors.stroke}
+                  strokeWidth={2}
+                />
+              )}
+
+              {/* Default Marker with custom color */}
+              <Marker
+                coordinate={{
+                  latitude: marker.latitude,
+                  longitude: marker.longitude,
+                }}
+                onPress={() => handleMarkerPress(marker)}
+                pinColor={getMarkerColor()}
+              />
+            </React.Fragment>
+          );
+        })}
       </MapView>
 
       {/* Top Bar */}
@@ -283,7 +275,6 @@ export default function HomeScreen() {
             size="md"
             imageSource={require('@/assets/images/sample-profile-picture.jpg')}
             onPress={() => {
-              // Navigate to profile screen
               router.push('/profile');
             }}
           />
@@ -293,12 +284,11 @@ export default function HomeScreen() {
       {/* Action Buttons */}
       <View
         className="absolute right-5 items-end gap-3 pb-4"
-        style={{ bottom: 0 }} // Push to bottom with padding
+        style={{ bottom: 0 }}
       >
         <LocationButton onPress={handleCenterOnUser} />
         <LayersButton
           onPress={() => {
-            // Handle layers press - open layers menu
             console.log('Layers pressed');
           }}
         />
@@ -309,9 +299,6 @@ export default function HomeScreen() {
         visible={sheetVisible}
         markerData={selectedMarker}
         onClose={hideBottomSheet}
-        onGetDirections={handleGetDirections}
-        onMoreInfo={handleMoreInfo}
-        onEdit={handleEdit}
       />
     </ThemedView>
   );
