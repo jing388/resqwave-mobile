@@ -165,7 +165,7 @@ export default function ProfileScreen() {
                     size="xl"
                     imageSource={require('@/assets/images/sample-profile-picture.jpg')}
                   />
-                  <View className="bg-primary absolute bottom-0 right-0 w-10 h-10 rounded-full items-center justify-center">
+                  <View className="bg-default-primary absolute bottom-0 right-0 w-10 h-10 rounded-full items-center justify-center">
                     <Camera size={20} color="white" />
                   </View>
                 </TouchableOpacity>
@@ -174,7 +174,7 @@ export default function ProfileScreen() {
 
             {/* Personal Information */}
             <View className="mb-6">
-              <Text className="text-background-muted text-sm font-geist-medium mb-4 pl-2 spacing-10 tracking-wide">
+              <Text className="text-text-muted text-sm font-geist-medium mb-4 pl-2 spacing-10 tracking-wide">
                 PERSONAL INFORMATION
               </Text>
 
@@ -238,7 +238,7 @@ export default function ProfileScreen() {
 
             {/* Password Section */}
             <View className="mb-8">
-              <Text className="text-background-muted text-sm font-geist-medium mb-4 pl-2 spacing-10 tracking-wide">
+              <Text className="text-text-muted text-sm font-geist-medium mb-4 pl-2 spacing-10 tracking-wide">
                 SECURITY
               </Text>
 
@@ -248,7 +248,7 @@ export default function ProfileScreen() {
                 activeOpacity={0.7}
               >
                 <View className="flex-row items-center">
-                  <View className="w-10 h-10 rounded-lg items-center justify-center mr-3 bg-primary/20">
+                  <View className="w-10 h-10 rounded-lg items-center justify-center mr-3 bg-default-primary/20">
                     <Lock size={20} color={'#3B82F6'} />
                   </View>
                   <View className="flex-1">

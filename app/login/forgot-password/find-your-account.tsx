@@ -26,14 +26,21 @@ export default function FindYourAccountScreen() {
   const [identifier, setIdentifier] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const isFormValid = identifier.trim().length > 0;
-
   const handleBack = () => {
     router.back();
   };
 
   const handleFindAccount = async () => {
-    if (!isFormValid || isLoading) return;
+    if (isLoading) return;
+
+    // Validate identifier
+    if (!identifier.trim()) {
+      Alert.alert(
+        'Validation Error',
+        'Please enter your email address or phone number.',
+      );
+      return;
+    }
 
     setIsLoading(true);
 
@@ -41,20 +48,8 @@ export default function FindYourAccountScreen() {
       // Simulate API call to find account
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // Navigate to reset password verification
-      Alert.alert(
-        'Success',
-        'If an account exists with this email/phone, you will receive a verification code.',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              // Navigate to verification screen for password reset
-              router.push('/verification');
-            },
-          },
-        ],
-      );
+      // Navigate to enter code sent screen
+      router.push('/login/forgot-password/enter-code-sent');
     } catch (error) {
       Alert.alert('Error', 'Unable to find account. Please try again.');
     } finally {

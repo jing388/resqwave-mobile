@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { Text, View } from 'react-native';
 
 interface InfoCardProps {
   title: string;
@@ -8,9 +8,9 @@ interface InfoCardProps {
 
 export const InfoCard = ({ title, children, className }: InfoCardProps) => (
   <View
-    className={`bg-gray-800/50 rounded-xl p-6 mb-4 border border-gray-700 ${className || ""}`}
+    className={`bg-gray-800/50 rounded-xl p-6 mb-4 border border-gray-700 ${className || ''}`}
   >
-    <Text className="text-background-muted text-sm font-geist-medium spacing-10 tracking-wide">
+    <Text className="text-text-muted text-sm font-geist-medium spacing-10 tracking-wide">
       {title}
     </Text>
     {children}

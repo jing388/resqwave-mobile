@@ -7,13 +7,10 @@ interface LayersButtonProps {
   className?: string;
 }
 
-export function LayersButton({ 
-  onPress,
-  className = ""
-}: LayersButtonProps) {
+export function LayersButton({ onPress, className = '' }: LayersButtonProps) {
   return (
     <TouchableOpacity
-      className={`w-12 h-12 rounded-lg bg-background justify-center items-center border border-white/10 ${className}`}
+      className={`w-12 h-12 rounded-lg bg-default-black justify-center items-center border border-white/10 ${className}`}
       onPress={onPress}
       activeOpacity={0.8}
       style={{
@@ -24,10 +21,7 @@ export function LayersButton({
         elevation: 4,
       }}
     >
-      <Layers 
-        size={20} 
-        color="#FFFFFF"
-      />
+      <Layers size={20} color="#FFFFFF" />
     </TouchableOpacity>
   );
 }

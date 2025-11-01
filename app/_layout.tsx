@@ -90,6 +90,20 @@ export default function RootLayout() {
               }}
             />
             <Stack.Screen
+              name="login/forgot-password/enter-code-sent"
+              options={{
+                headerShown: false,
+                animation: 'slide_from_right',
+              }}
+            />
+            <Stack.Screen
+              name="login/forgot-password/reset-password"
+              options={{
+                headerShown: false,
+                animation: 'slide_from_right',
+              }}
+            />
+            <Stack.Screen
               name="verification/index"
               options={{
                 headerShown: false,

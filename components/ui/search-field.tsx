@@ -17,14 +17,16 @@ interface SearchFieldProps {
   className?: string;
 }
 
-export function SearchField({ 
-  placeholder = "Search location",
+export function SearchField({
+  placeholder = 'Search location',
   onLocationSelect,
   locations = [],
-  className = ""
+  className = '',
 }: SearchFieldProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<LocationItem | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<LocationItem | null>(
+    null,
+  );
 
   const handleLocationSelect = (location: LocationItem) => {
     setSelectedLocation(location);
@@ -37,40 +39,38 @@ export function SearchField({
   return (
     <View className="flex-1 mr-3 relative">
       {/* Dropdown Trigger */}
-      <TouchableOpacity 
-        className={`flex-row items-center bg-background rounded-xl px-4 py-4 ${className}`}
+      <TouchableOpacity
+        className={`flex-row items-center bg-default-black rounded-xl px-4 py-4 ${className}`}
         onPress={() => setIsOpen(!isOpen)}
         activeOpacity={0.7}
       >
-        <Search 
-          size={16} 
-          color="#9CA3AF" 
-          style={{ marginRight: 8 }}
-        />
-        <Text className={`flex-1 text-md font-geist-regular ${
-          selectedLocation ? 'text-white' : 'text-gray-400'
-        }`}>
+        <Search size={16} color="#9CA3AF" style={{ marginRight: 8 }} />
+        <Text
+          className={`flex-1 text-md font-geist-regular ${
+            selectedLocation ? 'text-white' : 'text-gray-400'
+          }`}
+        >
           {displayText}
         </Text>
-        <ChevronDown 
-          size={16} 
+        <ChevronDown
+          size={16}
           color="#9CA3AF"
-          style={{ 
-            transform: [{ rotate: isOpen ? '180deg' : '0deg' }] 
+          style={{
+            transform: [{ rotate: isOpen ? '180deg' : '0deg' }],
           }}
         />
       </TouchableOpacity>
 
       {/* Dropdown List */}
       {isOpen && locations.length > 0 && (
-        <View 
-          className="absolute top-full left-0 right-0 bg-background rounded-xl border border-gray-600 mt-1 z-50"
-          style={{ 
+        <View
+          className="absolute top-full left-0 right-0 bg-default-black rounded-xl border border-gray-600 mt-1 z-50"
+          style={{
             maxHeight: 200,
-            overflow: 'hidden'
+            overflow: 'hidden',
           }}
         >
-          <ScrollView 
+          <ScrollView
             showsVerticalScrollIndicator={false}
             nestedScrollEnabled={true}
           >
@@ -78,19 +78,23 @@ export function SearchField({
               <TouchableOpacity
                 key={location.id}
                 className={`px-4 py-3 flex-row items-start gap-3 ${
-                  index !== locations.length - 1 ? 'border-b border-gray-700' : ''
-                } ${
-                  selectedLocation?.id === location.id ? 'bg-gray-700' : ''
-                }`}
+                  index !== locations.length - 1
+                    ? 'border-b border-gray-700'
+                    : ''
+                } ${selectedLocation?.id === location.id ? 'bg-gray-700' : ''}`}
                 onPress={() => handleLocationSelect(location)}
               >
                 <View className="bg-blue-500/20 rounded-lg p-2 mt-0.5">
                   <MapPin size={14} color="#60A5FA" />
                 </View>
                 <View className="flex-1">
-                  <Text className={`text-base font-geist-semibold mb-1 ${
-                    selectedLocation?.id === location.id ? 'text-blue-400' : 'text-white'
-                  }`}>
+                  <Text
+                    className={`text-base font-geist-semibold mb-1 ${
+                      selectedLocation?.id === location.id
+                        ? 'text-blue-400'
+                        : 'text-white'
+                    }`}
+                  >
                     {location.title}
                   </Text>
                   <Text className="text-gray-400 text-sm font-geist-regular">

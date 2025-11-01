@@ -1,6 +1,6 @@
-import { NeighborhoodData } from "@/types/neighborhood";
-import React from "react";
-import { Text, View } from "react-native";
+import { NeighborhoodData } from '@/types/neighborhood';
+import React from 'react';
+import { Text, View } from 'react-native';
 
 interface NeighborhoodViewProps {
   neighborhoodData: NeighborhoodData;
@@ -84,7 +84,7 @@ export const NeighborhoodView: React.FC<NeighborhoodViewProps> = ({
 
           {/* Flood-Related Hazards */}
           <View className="mt-6">
-            <Text className="text-background-muted text-sm font-geist-medium spacing-10 tracking-wide mb-3">
+            <Text className="text-text-muted text-sm font-geist-medium spacing-10 tracking-wide mb-3">
               FLOOD-RELATED HAZARDS
             </Text>
             {neighborhoodData.floodRelatedHazards.map(
@@ -97,13 +97,13 @@ export const NeighborhoodView: React.FC<NeighborhoodViewProps> = ({
                     {hazard}
                   </Text>
                 </View>
-              )
+              ),
             )}
           </View>
 
           {/* Other Notable Information */}
           <View className="mt-4">
-            <Text className="text-background-muted text-sm font-geist-medium spacing-10 tracking-wide mb-3">
+            <Text className="text-text-muted text-sm font-geist-medium spacing-10 tracking-wide mb-3">
               OTHER NOTABLE INFORMATION
             </Text>
             {neighborhoodData.notableInfo.map((info: string, index: number) => (
