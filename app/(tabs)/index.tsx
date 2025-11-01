@@ -3,7 +3,7 @@ import { LayersButton } from '@/components/main/layers-button';
 import { Pin } from '@/components/main/pin';
 import { LocationButton } from '@/components/main/your-location-button';
 import { Avatar } from '@/components/ui/avatar';
-import { SearchField } from '@/components/ui/search-field';
+import { SearchField } from '@/components/ui/location-search-field';
 import { ThemedView } from '@/components/ui/themed-view';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
