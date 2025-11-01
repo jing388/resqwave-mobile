@@ -37,7 +37,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
           error
             ? 'border-status-error'
             : isFocused
-              ? 'border-brand-primary'
+              ? 'border-default-primary'
               : 'border-card-border'
         }`}
       >

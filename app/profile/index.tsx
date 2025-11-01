@@ -8,7 +8,13 @@ import {
 } from '@gorhom/bottom-sheet';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { Camera, ChevronLeft, ChevronRight, Lock } from 'lucide-react-native';
+import {
+  Camera,
+  ChevronLeft,
+  ChevronRight,
+  Lock,
+  Logs,
+} from 'lucide-react-native';
 import React, { useRef, useState } from 'react';
 import {
   Platform,
@@ -89,6 +95,10 @@ export default function ProfileScreen() {
 
   const handleChangePassword = () => {
     router.push('/profile/password');
+  };
+
+  const handleViewLogs = () => {
+    router.push('/profile/logs');
   };
 
   const handleSignOut = () => {
@@ -257,6 +267,27 @@ export default function ProfileScreen() {
                     </Text>
                     <Text className="text-gray-400 text-xs mt-1 font-geist-regular">
                       Last changed: {userData.lastPasswordChange}
+                    </Text>
+                  </View>
+                  <ChevronRight size={20} color="#9CA3AF" />
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleViewLogs}
+                className="bg-gray-800 p-4 rounded-xl mb-3 border border-gray-600"
+                activeOpacity={0.7}
+              >
+                <View className="flex-row items-center">
+                  <View className="w-10 h-10 rounded-lg items-center justify-center mr-3 bg-default-primary/20">
+                    <Logs size={20} color={'#3B82F6'} />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-gray-50 text-base font-geist-medium">
+                      Logs
+                    </Text>
+                    <Text className="text-gray-400 text-xs mt-1 font-geist-regular">
+                      Last action: {userData.lastPasswordChange}
                     </Text>
                   </View>
                   <ChevronRight size={20} color="#9CA3AF" />
