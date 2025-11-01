@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000/api';
+  process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.13:5000';
 
 // Types
 export interface LoginCredentials {
@@ -45,31 +45,47 @@ class AuthService {
   // Focal Person Login (sends OTP)
   async focalLogin(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/focal-login`, {
+      const response = await fetch(`${API_BASE_URL}/focal/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(credentials),
+        body: JSON.stringify({
+          emailOrNumber: credentials.emailOrNumber,
+          password: credentials.password,
+        }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+        // Always show a generic error message for backend login errors
+        throw new Error(
+          'Invalid email/phone number or password. Please try again.',
+        );
       }
 
-      return data;
-    } catch (error) {
+      // Store OTP expiry time (5 minutes from now)
+      const otpExpiry = Date.now() + 5 * 60 * 1000;
+      await AsyncStorage.setItem('focalOtpExpiry', otpExpiry.toString());
+
+      return {
+        message: data.message,
+        tempToken: data.tempToken || '',
+      };
+    } catch (error: any) {
       console.error('Login error:', error);
-      throw error;
+      // Always show a generic error message
+      throw new Error(
+        'Invalid email/phone number or password. Please try again.',
+      );
     }
   }
 
   // Verify OTP code
   async verifyCode(request: VerifyCodeRequest): Promise<VerifyCodeResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/focal-verify`, {
+      const response = await fetch(`${API_BASE_URL}/focal/verify`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

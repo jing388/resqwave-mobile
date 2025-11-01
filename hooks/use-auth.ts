@@ -12,7 +12,7 @@ export const useAuth = () => {
 
       // Use mock login for development
       // Switch to authService.focalLogin when backend is ready
-      const USE_MOCK = true; // Change to false when backend is ready
+      const USE_MOCK = false; // Change to false when backend is ready
 
       const response = USE_MOCK
         ? await authService.mockLogin({ emailOrNumber, password })

@@ -141,10 +141,10 @@ export default function LoginScreen() {
             <View className="flex-1 px-6">
               {/* Logo and Title */}
               <View className="items-center mb-10">
-                <View className="w-20 h-20 justify-center items-center">
+                <View className="w-20 h-20 justify-center items-center mb-2">
                   <Image
                     source={require('@/assets/images/resqwave-logo.png')}
-                    className="w-10 h-10"
+                    className="w-14 h-14"
                   />
                 </View>
                 <Text className="text-text-primary text-4xl font-geist-semibold mb-4 text-center">

@@ -20,7 +20,7 @@ export default function WelcomeScreen() {
         <View className="flex-1 items-center justify-center">
           <Image
             source={require('@/assets/images/resqwave-logo.png')}
-            className="w-10 h-10 mb-4"
+            className="w-16 h-16 mb-4"
           />
           <Text className="font-geist-semibold text-text-primary text-4xl leading-[1.5] text-center mb-12">
             Stronger Signals,{'\n'}Safer Communities.
