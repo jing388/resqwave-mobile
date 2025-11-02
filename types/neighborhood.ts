@@ -1,3 +1,67 @@
+// Backend response types
+export interface BackendOwnNeighborhood {
+  neighborhoodID: string;
+  terminalID: string;
+  focalPerson: {
+    name: string | null;
+    alternativeFPFirstName: string | null;
+    alternativeFPLastName: string | null;
+    alternativeFPEmail: string | null;
+    alternativeFPNumber: string | null;
+    alternativeFPImage: any | null;
+  };
+  address: string | null; // JSON string with lat/lng
+  hazards: string[];
+  createdDate: string | null;
+}
+
+export interface BackendOtherNeighborhood {
+  neighborhoodID: string;
+  hazards: string[];
+  createdDate: string | null;
+  address: string | null; // JSON string with lat/lng
+  focalPerson: string | null;
+}
+
+export interface BackendNeighborhoodDetails {
+  neighborhoodID: string;
+  terminalID: string;
+  noOfHouseholds: string;
+  noOfResidents: string;
+  floodwaterSubsidenceDuration: string;
+  hazards: string[];
+  otherInformation: string | null;
+  focalPerson: {
+    name: string | null;
+    number: string | null;
+    email: string | null;
+    photo: any | null;
+    alternativeFPFirstName: string | null;
+    alternativeFPLastName: string | null;
+    alternativeFPEmail: string | null;
+    alternativeFPNumber: string | null;
+    alternativeFPImage: any | null;
+  };
+  address: string | null;
+  createdDate: string | null;
+  updatedDate: string | null;
+}
+
+// Frontend marker type for map display
+export interface MarkerData {
+  id: string;
+  latitude: number;
+  longitude: number;
+  neighborhoodID: string;
+  terminalID: string;
+  address: string;
+  dateRegistered: string;
+  type: 'own' | 'other';
+  focalPersonName: string | null;
+  hazards: string[];
+}
+
+// Frontend display types
 export interface NeighborhoodData {
   id: string;
   name: string;

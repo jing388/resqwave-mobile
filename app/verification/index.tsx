@@ -1,12 +1,14 @@
 import { BottomButtonContainer } from '@/components/ui/bottom-button-container';
 import CustomButton from '@/components/ui/custom-button';
 import { colors } from '@/constants/colors';
+import { useAuth } from '@/hooks/use-auth';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   Image,
   Keyboard,
   KeyboardAvoidingView,
@@ -23,10 +25,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function VerificationScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const { verifyCode, resendCode, isLoading } = useAuth();
+
+  const tempToken = params.tempToken as string;
+  const identifier = params.identifier as string;
   const [code, setCode] = useState('');
   const [resendTime, setResendTime] = useState(30);
   const [isResendDisabled, setIsResendDisabled] = useState(true);
-  const [isVerifying, setIsVerifying] = useState(false);
   const [verificationSuccess, setVerificationSuccess] = useState(false);
   const scale = useSharedValue(1);
 
@@ -37,13 +43,11 @@ export default function VerificationScreen() {
   };
 
   const handleVerify = async () => {
-    if (!isCodeComplete || isVerifying) return;
-
-    setIsVerifying(true);
+    if (!isCodeComplete || isLoading) return;
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Call the verify API with tempToken and code
+      await verifyCode(tempToken, code);
 
       // Show success state
       setVerificationSuccess(true);
@@ -55,11 +59,12 @@ export default function VerificationScreen() {
       setTimeout(() => {
         router.replace('/(tabs)');
       }, 1000);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Verification failed:', error);
-      // Handle error state here
-    } finally {
-      setIsVerifying(false);
+      Alert.alert(
+        'Verification Failed',
+        error.message || 'Invalid verification code. Please try again.',
+      );
     }
   };
 
@@ -67,15 +72,25 @@ export default function VerificationScreen() {
     setCode(text);
   };
 
-  const handleResend = () => {
-    if (isResendDisabled) return;
+  const handleResend = async () => {
+    if (isResendDisabled || isLoading) return;
 
-    // Reset timer to 30 seconds
-    setResendTime(30);
-    setIsResendDisabled(true);
+    try {
+      // Call the resend API
+      await resendCode(tempToken);
 
-    // Here you would typically trigger the resend code API call
-    console.log('Resending verification code...');
+      // Reset timer to 30 seconds
+      setResendTime(30);
+      setIsResendDisabled(true);
+
+      Alert.alert('Success', 'Verification code has been resent to your email');
+    } catch (error: any) {
+      console.error('Resend failed:', error);
+      Alert.alert(
+        'Resend Failed',
+        error.message || 'Failed to resend code. Please try again.',
+      );
+    }
   };
 
   useEffect(() => {
@@ -254,7 +269,7 @@ export default function VerificationScreen() {
         <BottomButtonContainer>
           <CustomButton
             title={
-              isVerifying
+              isLoading
                 ? 'Verifying...'
                 : verificationSuccess
                   ? 'Success!'
@@ -264,7 +279,7 @@ export default function VerificationScreen() {
             variant={isCodeComplete ? 'gradient-accent' : 'primary'}
             size="lg"
             width="full"
-            disabled={!isCodeComplete || isVerifying || verificationSuccess}
+            disabled={!isCodeComplete || isLoading || verificationSuccess}
           />
         </BottomButtonContainer>
 

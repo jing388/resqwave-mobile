@@ -7,11 +7,14 @@ import { SearchField } from '@/components/ui/location-search-field';
 import { ThemedView } from '@/components/ui/themed-view';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useNeighborhoods } from '@/hooks/use-neighborhoods';
+import { MarkerData } from '@/types/neighborhood';
 import type { LocationObject } from 'expo-location';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Dimensions,
   PermissionsAndroid,
   Platform,
@@ -28,26 +31,16 @@ const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.005;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-// Marker data interface (this is what you'll get from your database)
-interface MarkerData {
-  id: string;
-  latitude: number;
-  longitude: number;
-  neighborhoodID: string;
-  terminalID: string;
-  terminalAddress: string;
-  dateRegistered: string;
-  lastUpdatedAt: string;
-  type: 'emergency' | 'safe-zone' | 'default';
-  title?: string;
-  description?: string;
-}
-
 export default function HomeScreen() {
   const colorScheme = useColorScheme() || 'light';
   const insets = useSafeAreaInsets();
   const mapRef = useRef<MapView>(null);
   const colors = Colors[colorScheme];
+
+  // Fetch neighborhoods from backend
+  const { markers, ownNeighborhood, isLoading, error, refetch } =
+    useNeighborhoods();
+
   const [location, setLocation] = useState<LocationObject | null>(null);
   const [region, setRegion] = useState<Region>({
     latitude: 14.765,
@@ -59,46 +52,16 @@ export default function HomeScreen() {
   const [sheetVisible, setSheetVisible] = useState(false);
   const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
 
-  // Dynamic markers array - THIS IS WHERE YOU'LL PUT YOUR DATABASE DATA
-  const [markers, setMarkers] = useState<MarkerData[]>([
-    {
-      id: '1',
-      latitude: 14.5995,
-      longitude: 120.9842,
-      neighborhoodID: 'N-1',
-      terminalID: 'TERM-001',
-      terminalAddress: '123 Main Street, Barangay Centro',
-      dateRegistered: 'September 15, 2023',
-      lastUpdatedAt: 'September 25, 2023, 14:30',
-      type: 'emergency',
-      title: 'Emergency Report',
-      description: 'Fire incident reported',
-    },
-    {
-      id: '2',
-      latitude: 14.765,
-      longitude: 121.0392,
-      neighborhoodID: 'Safe Zone Alpha',
-      terminalID: 'RSQW-001',
-      terminalAddress: 'Barangay 175 Subdivision, Camarin, Caloocan City North',
-      dateRegistered: 'August 10, 2023',
-      lastUpdatedAt: 'September 25, 2023, 12:15',
-      type: 'safe-zone',
-      title: 'Safe Zone',
-      description: 'Evacuation center',
-    },
-  ]);
-
   // Pinned locations for search (derived from markers)
   const pinnedLocations = markers.map((marker) => ({
     id: marker.id,
     title: marker.neighborhoodID,
-    address: marker.terminalAddress,
+    address: marker.address,
     latitude: marker.latitude,
     longitude: marker.longitude,
   }));
 
-  // Request location permission
+  // Request location permission and center map
   useEffect(() => {
     (async () => {
       if (Platform.OS === 'android') {
@@ -120,14 +83,25 @@ export default function HomeScreen() {
       const currentLocation = await Location.getCurrentPositionAsync({});
       setLocation(currentLocation);
 
-      setRegion({
-        latitude: currentLocation.coords.latitude,
-        longitude: currentLocation.coords.longitude,
-        latitudeDelta: LATITUDE_DELTA,
-        longitudeDelta: LONGITUDE_DELTA,
-      });
+      // If own neighborhood is available, center on it
+      if (ownNeighborhood) {
+        setRegion({
+          latitude: ownNeighborhood.latitude,
+          longitude: ownNeighborhood.longitude,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        });
+      } else {
+        // Otherwise center on user location
+        setRegion({
+          latitude: currentLocation.coords.latitude,
+          longitude: currentLocation.coords.longitude,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        });
+      }
     })();
-  }, []);
+  }, [ownNeighborhood]);
 
   const onRegionChangeComplete = useCallback((newRegion: Region) => {
     setRegion(newRegion);
@@ -194,6 +168,14 @@ export default function HomeScreen() {
         backgroundColor="transparent"
         translucent
       />
+
+      {/* Loading Overlay */}
+      {isLoading && (
+        <View className="absolute inset-0 z-50 bg-black/50 items-center justify-center">
+          <ActivityIndicator size="large" color="#34D399" />
+        </View>
+      )}
+
       <MapView
         ref={mapRef}
         style={styles.map}
@@ -217,17 +199,30 @@ export default function HomeScreen() {
 
         {/* Dynamically render all markers and their circles */}
         {markers.map((marker) => {
-          const colors = getPinColors(marker.type);
           // Get marker color based on type
           const getMarkerColor = () => {
             switch (marker.type) {
-              case 'emergency':
-                return '#FF3B30';
-              case 'safe-zone':
-                return '#34D399';
+              case 'own':
+                return '#34D399'; // Green for own neighborhood
+              case 'other':
+                return '#9CA3AF'; // Gray for other neighborhoods
               default:
-                return '#007AFF';
+                return '#007AFF'; // Blue fallback
             }
+          };
+
+          const markerColor = getMarkerColor();
+
+          // Circle colors for active marker
+          const circleColors = {
+            fill:
+              marker.type === 'own'
+                ? 'rgba(52, 211, 153, 0.1)'
+                : 'rgba(156, 163, 175, 0.1)',
+            stroke:
+              marker.type === 'own'
+                ? 'rgba(52, 211, 153, 0.3)'
+                : 'rgba(156, 163, 175, 0.3)',
           };
 
           return (
@@ -240,20 +235,20 @@ export default function HomeScreen() {
                     longitude: marker.longitude,
                   }}
                   radius={100}
-                  fillColor={colors.fill}
-                  strokeColor={colors.stroke}
+                  fillColor={circleColors.fill}
+                  strokeColor={circleColors.stroke}
                   strokeWidth={2}
                 />
               )}
 
-              {/* Default Marker with custom color */}
+              {/* Marker with custom color */}
               <Marker
                 coordinate={{
                   latitude: marker.latitude,
                   longitude: marker.longitude,
                 }}
                 onPress={() => handleMarkerPress(marker)}
-                pinColor={getMarkerColor()}
+                pinColor={markerColor}
               />
             </React.Fragment>
           );
