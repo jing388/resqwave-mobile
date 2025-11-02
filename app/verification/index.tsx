@@ -26,7 +26,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function VerificationScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { verifyCode, isLoading } = useAuth();
+  const { verifyCode, resendCode, isLoading } = useAuth();
 
   const tempToken = params.tempToken as string;
   const identifier = params.identifier as string;
@@ -72,15 +72,25 @@ export default function VerificationScreen() {
     setCode(text);
   };
 
-  const handleResend = () => {
-    if (isResendDisabled) return;
+  const handleResend = async () => {
+    if (isResendDisabled || isLoading) return;
 
-    // Reset timer to 30 seconds
-    setResendTime(30);
-    setIsResendDisabled(true);
+    try {
+      // Call the resend API
+      await resendCode(tempToken);
 
-    // Here you would typically trigger the resend code API call
-    console.log('Resending verification code...');
+      // Reset timer to 30 seconds
+      setResendTime(30);
+      setIsResendDisabled(true);
+
+      Alert.alert('Success', 'Verification code has been resent to your email');
+    } catch (error: any) {
+      console.error('Resend failed:', error);
+      Alert.alert(
+        'Resend Failed',
+        error.message || 'Failed to resend code. Please try again.',
+      );
+    }
   };
 
   useEffect(() => {

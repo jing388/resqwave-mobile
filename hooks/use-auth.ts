@@ -34,7 +34,7 @@ export const useAuth = () => {
       setError(null);
 
       // Use mock verify for development
-      const USE_MOCK = true; // Change to false when backend is ready
+      const USE_MOCK = false; // Change to false when backend is ready
 
       const response = USE_MOCK
         ? await authService.mockVerifyCode({ tempToken, code })
@@ -43,6 +43,22 @@ export const useAuth = () => {
       return response;
     } catch (err: any) {
       const errorMessage = err.message || 'Verification failed';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resendCode = async (tempToken: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await authService.resendFocalLoginCode(tempToken);
+      return response;
+    } catch (err: any) {
+      const errorMessage = err.message || 'Failed to resend code';
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
@@ -66,6 +82,7 @@ export const useAuth = () => {
   return {
     login,
     verifyCode,
+    resendCode,
     logout,
     isLoading,
     error,
