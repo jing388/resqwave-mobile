@@ -1,6 +1,6 @@
 import { ChevronDown, MapPin, Search } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 
 interface LocationItem {
   id: string;
@@ -65,18 +65,17 @@ export function SearchField({
       {isOpen && locations.length > 0 && (
         <View
           className="absolute top-full left-0 right-0 bg-default-black rounded-xl border border-gray-600 mt-1 z-50"
-          style={{
-            maxHeight: 200,
-            overflow: 'hidden',
-          }}
+          style={{ maxHeight: 250 }}
         >
-          <ScrollView
-            showsVerticalScrollIndicator={false}
+          <FlatList
+            data={locations}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={true}
             nestedScrollEnabled={true}
-          >
-            {locations.map((location, index) => (
+            keyboardShouldPersistTaps="handled"
+            style={{ maxHeight: 250 }}
+            renderItem={({ item: location, index }) => (
               <TouchableOpacity
-                key={location.id}
                 className={`px-4 py-3 flex-row items-start gap-3 ${
                   index !== locations.length - 1
                     ? 'border-b border-gray-700'
@@ -102,8 +101,8 @@ export function SearchField({
                   </Text>
                 </View>
               </TouchableOpacity>
-            ))}
-          </ScrollView>
+            )}
+          />
         </View>
       )}
     </View>

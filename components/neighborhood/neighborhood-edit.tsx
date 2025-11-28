@@ -1,8 +1,11 @@
 import { Dropdown } from '@/components/ui/dropdown';
+import { EditableCheckbox } from '@/components/ui/editable-checkbox';
+import { EditInfoCard } from '@/components/ui/edit-info-card';
 import { EditedData, NeighborhoodData } from '@/types/neighborhood';
 import { Check, X } from 'lucide-react-native';
 import React from 'react';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { formatDate } from '@/utils/formatters';
 
 interface DropdownOption {
   label: string;
@@ -21,18 +24,9 @@ interface NeighborhoodEditProps {
   onDropdownChange: (field: string, value: string) => void;
   onHazardToggle: (index: number) => void;
   onNotableInfoChange: (text: string) => void;
+  onAlternativeFocalChange: (field: string, value: string) => void;
   onCancel: () => void;
   onSubmit: () => void;
-  DetailRow: React.ComponentType<{
-    label: string;
-    value: string | number;
-    showAvatar?: boolean;
-  }>;
-  InfoCard: React.ComponentType<{
-    title: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
 const EditableDropdown = ({
@@ -59,32 +53,6 @@ const EditableDropdown = ({
   </View>
 );
 
-const EditableCheckbox = ({
-  label,
-  checked,
-  onToggle,
-}: {
-  label: string;
-  checked: boolean;
-  onToggle: () => void;
-}) => (
-  <TouchableOpacity
-    className="flex-row items-center py-2 mb-2"
-    onPress={onToggle}
-  >
-    <View
-      className={`w-5 h-5 rounded border-2 mr-3 items-center justify-center ${
-        checked ? 'bg-blue-500 border-blue-500' : 'border-gray-600 bg-gray-800'
-      }`}
-    >
-      {checked && <Check size={12} color="#ffffff" />}
-    </View>
-    <Text className="text-white text-sm font-geist-regular flex-1 leading-5">
-      {label}
-    </Text>
-  </TouchableOpacity>
-);
-
 const EditableTextArea = ({
   label,
   value,
@@ -94,18 +62,46 @@ const EditableTextArea = ({
   value: string;
   onChange: (text: string) => void;
 }) => (
-  <View className="mb-4">
+  <View>
     <Text className="text-gray-300 text-base font-geist-medium mb-2">
       {label}
     </Text>
     <TextInput
-      className="border border-gray-600 rounded-lg bg-gray-800 px-3 py-3 text-white text-base min-h-[100px]"
+      className="border border-gray-600 rounded-lg font-geist-light bg-gray-800 px-3 py-3 text-white text-base min-h-[80px]"
       value={value}
       onChangeText={onChange}
       multiline
       textAlignVertical="top"
       placeholder="Enter information..."
       placeholderTextColor="#9CA3AF"
+    />
+  </View>
+);
+
+const EditableTextField = ({
+  label,
+  value,
+  onChange,
+  placeholder,
+  keyboardType = 'default',
+}: {
+  label: string;
+  value: string;
+  onChange: (text: string) => void;
+  placeholder?: string;
+  keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
+}) => (
+  <View className="mb-4">
+    <Text className="text-gray-300 text-base font-geist-medium mb-2">
+      {label}
+    </Text>
+    <TextInput
+      className="border border-gray-600 rounded-lg bg-gray-800 px-3 py-3 text-white text-base"
+      value={value}
+      onChangeText={onChange}
+      placeholder={placeholder || `Enter ${label.toLowerCase()}`}
+      placeholderTextColor="#9CA3AF"
+      keyboardType={keyboardType}
     />
   </View>
 );
@@ -117,38 +113,17 @@ export const NeighborhoodEdit: React.FC<NeighborhoodEditProps> = ({
   onDropdownChange,
   onHazardToggle,
   onNotableInfoChange,
+  onAlternativeFocalChange,
   onCancel,
   onSubmit,
-  DetailRow,
-  InfoCard,
 }) => {
   return (
     <>
-      {/* Basic Information - Read Only */}
-      <View className="px-6 mb-6">
-        <InfoCard title="ABOUT THE NEIGHBORHOOD">
-          <DetailRow label="Name" value={neighborhoodData.name} />
-          <DetailRow
-            label="Registered At"
-            value={neighborhoodData.registeredAt}
-          />
-          <DetailRow label="Terminal ID" value={neighborhoodData.terminalID} />
-          <DetailRow
-            label="Terminal Address"
-            value={neighborhoodData.terminalAddress}
-          />
-          <DetailRow
-            label="Coordinates"
-            value={`${neighborhoodData.coordinates.latitude}, ${neighborhoodData.coordinates.longitude}`}
-          />
-        </InfoCard>
-      </View>
-
-      {/* Population Statistics - Editable */}
-      <View className="px-6 mb-6">
-        <InfoCard title="Population Statistics">
+      {/* Neighborhood Information - Editable */}
+      <View className="px-6">
+        <EditInfoCard title="NEIGHBORHOOD INFORMATION">
           <EditableDropdown
-            label="Approx. Households"
+            label="Approximate No. of Households"
             value={String(editedData.approxHouseholds)}
             options={dropdownOptions.households}
             onChange={(value) => onDropdownChange('approxHouseholds', value)}
@@ -160,18 +135,6 @@ export const NeighborhoodEdit: React.FC<NeighborhoodEditProps> = ({
             onChange={(value) => onDropdownChange('approxResidents', value)}
           />
           <EditableDropdown
-            label="Avg. Household Size"
-            value={String(editedData.avgHouseholdSize)}
-            options={dropdownOptions.householdSize}
-            onChange={(value) => onDropdownChange('avgHouseholdSize', value)}
-          />
-        </InfoCard>
-      </View>
-
-      {/* Flood Information - Editable */}
-      <View className="px-6 mb-6">
-        <InfoCard title="Flood Information">
-          <EditableDropdown
             label="Floodwater Subsidence Duration"
             value={editedData.floodwaterSubsidence}
             options={dropdownOptions.subsidenceDuration}
@@ -182,7 +145,7 @@ export const NeighborhoodEdit: React.FC<NeighborhoodEditProps> = ({
 
           <View className="mt-4">
             <Text className="text-gray-300 text-base font-geist-medium mb-3">
-              Flood Related Hazards:
+              Flood Related Hazards
             </Text>
             {editedData.floodRelatedHazards.map((hazard, index) => (
               <EditableCheckbox
@@ -193,18 +156,47 @@ export const NeighborhoodEdit: React.FC<NeighborhoodEditProps> = ({
               />
             ))}
           </View>
-        </InfoCard>
+
+          <View className="mt-4">
+            <EditableTextArea
+              label="Other Notable Information"
+              value={editedData.notableInfo}
+              onChange={onNotableInfoChange}
+            />
+          </View>
+        </EditInfoCard>
       </View>
 
-      {/* Other Notable Information - Editable */}
+      {/* Alternative Focal Person - Editable */}
       <View className="px-6 mb-8">
-        <InfoCard title="Other Notable Information">
-          <EditableTextArea
-            label="Additional Information"
-            value={editedData.notableInfo}
-            onChange={onNotableInfoChange}
+        <EditInfoCard title="ALTERNATIVE FOCAL PERSON">
+          <EditableTextField
+            label="First Name"
+            value={editedData.alternativeFocalPerson.firstName}
+            onChange={(value) => onAlternativeFocalChange('firstName', value)}
+            placeholder="Enter first name"
           />
-        </InfoCard>
+          <EditableTextField
+            label="Last Name"
+            value={editedData.alternativeFocalPerson.lastName}
+            onChange={(value) => onAlternativeFocalChange('lastName', value)}
+            placeholder="Enter last name"
+          />
+          <EditableTextField
+            label="Contact Number"
+            value={editedData.alternativeFocalPerson.contactNo}
+            onChange={(value) => onAlternativeFocalChange('contactNo', value)}
+            placeholder="Enter contact number"
+            keyboardType="phone-pad"
+          />
+          <EditableTextField
+            label="Email"
+            value={editedData.alternativeFocalPerson.email}
+            onChange={(value) => onAlternativeFocalChange('email', value)}
+            placeholder="Enter email address"
+            keyboardType="email-address"
+          />
+        </EditInfoCard>
       </View>
 
       {/* Submit/Cancel Buttons */}

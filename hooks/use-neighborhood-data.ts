@@ -1,17 +1,17 @@
 import {
   availableHazards,
   dropdownOptions,
-} from "@/constants/neighborhood-options";
+} from '@/constants/neighborhood-options';
 import {
   fetchNeighborhoodData,
   updateNeighborhoodData,
-} from "@/services/neighborhood-service";
+} from '@/services/neighborhood-service';
 import {
   EditedData,
   FloodHazard,
   NeighborhoodData,
-} from "@/types/neighborhood";
-import { useEffect, useState } from "react";
+} from '@/types/neighborhood';
+import { useEffect, useState } from 'react';
 
 export interface UseNeighborhoodDataReturn {
   isEditMode: boolean;
@@ -25,6 +25,7 @@ export interface UseNeighborhoodDataReturn {
   handleDropdownChange: (field: string, value: string) => void;
   handleHazardToggle: (index: number) => void;
   handleNotableInfoChange: (text: string) => void;
+  handleAlternativeFocalChange: (field: string, value: string) => void;
 }
 
 export const useNeighborhoodData = (): UseNeighborhoodDataReturn => {
@@ -38,9 +39,15 @@ export const useNeighborhoodData = (): UseNeighborhoodDataReturn => {
     approxHouseholds: 0,
     approxResidents: 0,
     avgHouseholdSize: 0,
-    floodwaterSubsidence: "",
+    floodwaterSubsidence: '',
     floodRelatedHazards: [] as FloodHazard[],
-    notableInfo: "",
+    notableInfo: '',
+    alternativeFocalPerson: {
+      firstName: '',
+      lastName: '',
+      contactNo: '',
+      email: '',
+    },
   });
 
   // Fetch neighborhood data from backend
@@ -49,6 +56,12 @@ export const useNeighborhoodData = (): UseNeighborhoodDataReturn => {
       try {
         setIsLoading(true);
         const data = await fetchNeighborhoodData();
+
+        if (!data) {
+          console.error('No neighborhood data returned');
+          return;
+        }
+
         setNeighborhoodData(data);
 
         // Initialize edited data with fetched data
@@ -60,13 +73,22 @@ export const useNeighborhoodData = (): UseNeighborhoodDataReturn => {
           floodRelatedHazards: availableHazards.map((hazard) => ({
             label: hazard,
             checked: data.floodRelatedHazards.some(
-              (h) => hazard.includes(h) || h.includes(hazard.split(" (")[0])
+              (h) => hazard.includes(h) || h.includes(hazard.split(' (')[0]),
             ),
           })),
-          notableInfo: data.notableInfo.join("\n"),
+          notableInfo: data.notableInfo.join('\n'),
+          alternativeFocalPerson: {
+            firstName: data.alternativeFocalPerson.name.split(' ')[0] || '',
+            lastName:
+              data.alternativeFocalPerson.name.split(' ').slice(1).join(' ') ||
+              '',
+            contactNo: data.alternativeFocalPerson.contactNo || '',
+            email: data.alternativeFocalPerson.email || '',
+            avatar: data.alternativeFocalPerson.avatar,
+          },
         });
       } catch (error) {
-        console.error("Error fetching neighborhood data:", error);
+        console.error('Error fetching neighborhood data:', error);
         // TODO: Show error message to user
       } finally {
         setIsLoading(false);
@@ -93,10 +115,22 @@ export const useNeighborhoodData = (): UseNeighborhoodDataReturn => {
         floodRelatedHazards: availableHazards.map((hazard) => ({
           label: hazard,
           checked: neighborhoodData.floodRelatedHazards.some(
-            (h) => hazard.includes(h) || h.includes(hazard.split(" (")[0])
+            (h) => hazard.includes(h) || h.includes(hazard.split(' (')[0]),
           ),
         })),
-        notableInfo: neighborhoodData.notableInfo.join("\n"),
+        notableInfo: neighborhoodData.notableInfo.join('\n'),
+        alternativeFocalPerson: {
+          firstName:
+            neighborhoodData.alternativeFocalPerson.name.split(' ')[0] || '',
+          lastName:
+            neighborhoodData.alternativeFocalPerson.name
+              .split(' ')
+              .slice(1)
+              .join(' ') || '',
+          contactNo: neighborhoodData.alternativeFocalPerson.contactNo || '',
+          email: neighborhoodData.alternativeFocalPerson.email || '',
+          avatar: neighborhoodData.alternativeFocalPerson.avatar,
+        },
       });
     }
   };
@@ -114,10 +148,10 @@ export const useNeighborhoodData = (): UseNeighborhoodDataReturn => {
         floodwaterSubsidence: editedData.floodwaterSubsidence,
         floodRelatedHazards: editedData.floodRelatedHazards
           .filter((h) => h.checked)
-          .map((h) => h.label.split(" (")[0]),
+          .map((h) => h.label.split(' (')[0]),
         notableInfo: editedData.notableInfo
-          .split("\n")
-          .filter((line) => line.trim() !== ""),
+          .split('\n')
+          .filter((line) => line.trim() !== ''),
       };
 
       await updateNeighborhoodData(updatedDataParams);
@@ -138,7 +172,7 @@ export const useNeighborhoodData = (): UseNeighborhoodDataReturn => {
       setIsEditMode(false);
       // TODO: Show success message to user
     } catch (error) {
-      console.error("Error updating neighborhood data:", error);
+      console.error('Error updating neighborhood data:', error);
       // TODO: Show error message to user
     }
   };
@@ -147,9 +181,9 @@ export const useNeighborhoodData = (): UseNeighborhoodDataReturn => {
     setEditedData((prev) => ({
       ...prev,
       [field]:
-        field === "approxHouseholds" || field === "approxResidents"
+        field === 'approxHouseholds' || field === 'approxResidents'
           ? parseInt(value)
-          : field === "avgHouseholdSize"
+          : field === 'avgHouseholdSize'
             ? parseFloat(value)
             : value,
     }));
@@ -159,7 +193,7 @@ export const useNeighborhoodData = (): UseNeighborhoodDataReturn => {
     setEditedData((prev) => ({
       ...prev,
       floodRelatedHazards: prev.floodRelatedHazards.map((hazard, i) =>
-        i === index ? { ...hazard, checked: !hazard.checked } : hazard
+        i === index ? { ...hazard, checked: !hazard.checked } : hazard,
       ),
     }));
   };
@@ -168,6 +202,16 @@ export const useNeighborhoodData = (): UseNeighborhoodDataReturn => {
     setEditedData((prev) => ({
       ...prev,
       notableInfo: text,
+    }));
+  };
+
+  const handleAlternativeFocalChange = (field: string, value: string) => {
+    setEditedData((prev) => ({
+      ...prev,
+      alternativeFocalPerson: {
+        ...prev.alternativeFocalPerson,
+        [field]: value,
+      },
     }));
   };
 
@@ -183,5 +227,6 @@ export const useNeighborhoodData = (): UseNeighborhoodDataReturn => {
     handleDropdownChange,
     handleHazardToggle,
     handleNotableInfoChange,
+    handleAlternativeFocalChange,
   };
 };

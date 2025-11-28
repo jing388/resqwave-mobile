@@ -1,6 +1,7 @@
 import { NeighborhoodData } from '@/types/neighborhood';
 import React from 'react';
 import { Text, View } from 'react-native';
+import { formatDate } from '@/utils/formatters';
 
 interface NeighborhoodViewProps {
   neighborhoodData: NeighborhoodData;
@@ -36,7 +37,7 @@ export const NeighborhoodView: React.FC<NeighborhoodViewProps> = ({
             {/* Registered At */}
             <DetailRow
               label="Registered At"
-              value={neighborhoodData.registeredAt}
+              value={formatDate(neighborhoodData.registeredAt)}
             />
             <Separator />
 

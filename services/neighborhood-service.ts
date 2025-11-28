@@ -136,7 +136,7 @@ export const fetchOtherNeighborhoods = async (): Promise<MarkerData[]> => {
  * Fetch detailed neighborhood information (for info sheet)
  */
 export const fetchNeighborhoodDetails = async (
-  neighborhoodId: string,
+  neighborhoodId?: string,
 ): Promise<NeighborhoodData | null> => {
   try {
     const data =
