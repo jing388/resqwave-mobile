@@ -4,6 +4,7 @@ import { Pencil, Radio } from 'lucide-react-native';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { MarkerData } from '@/types/neighborhood';
+import { formatDate } from '@/utils/formatters';
 
 interface InfoSheetProps {
   visible: boolean;
@@ -142,17 +143,12 @@ export function InfoSheet({
             {/* Date Registered */}
             <DetailRow
               label="Date Registered"
-              value={markerData.dateRegistered || 'Unknown'}
+              value={
+                markerData.dateRegistered
+                  ? formatDate(markerData.dateRegistered)
+                  : 'Unknown'
+              }
             />
-
-            {/* Hazards Count */}
-            {markerData.hazards && markerData.hazards.length > 0 && (
-              <DetailRow
-                label="Hazards"
-                value={`${markerData.hazards.length} identified`}
-                valueStyle="text-yellow-400"
-              />
-            )}
           </View>
         </LinearGradient>
       </BottomSheetView>

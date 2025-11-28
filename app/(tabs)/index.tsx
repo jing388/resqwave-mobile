@@ -61,6 +61,9 @@ export default function HomeScreen() {
     longitude: marker.longitude,
   }));
 
+  console.log('📍 Total markers:', markers.length);
+  console.log('📍 Pinned locations for search:', pinnedLocations.length);
+
   // Request location permission and center map
   useEffect(() => {
     (async () => {
@@ -259,8 +262,9 @@ export default function HomeScreen() {
       <View
         className="absolute top-0 left-0 right-0 px-5 z-10 items-center"
         style={{ paddingTop: insets.top + 10 }}
+        pointerEvents="box-none"
       >
-        <View className="flex-row items-center w-full">
+        <View className="flex-row items-center w-full" pointerEvents="auto">
           <SearchField
             placeholder="Search locations"
             locations={pinnedLocations}

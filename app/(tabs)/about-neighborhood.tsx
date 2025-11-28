@@ -33,6 +33,7 @@ export default function AboutNeighborhoodScreen() {
     handleDropdownChange,
     handleHazardToggle,
     handleNotableInfoChange,
+    handleAlternativeFocalChange,
   } = useNeighborhoodData();
 
   // Reanimated values for header
@@ -58,10 +59,9 @@ export default function AboutNeighborhoodScreen() {
           onDropdownChange={handleDropdownChange}
           onHazardToggle={handleHazardToggle}
           onNotableInfoChange={handleNotableInfoChange}
+          onAlternativeFocalChange={handleAlternativeFocalChange}
           onCancel={handleCancelEdit}
           onSubmit={handleSubmitEdit}
-          DetailRow={DetailRow}
-          InfoCard={InfoCard}
         />
       );
     }

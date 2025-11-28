@@ -105,4 +105,11 @@ export interface EditedData {
   floodwaterSubsidence: string;
   floodRelatedHazards: FloodHazard[];
   notableInfo: string;
+  alternativeFocalPerson: {
+    firstName: string;
+    lastName: string;
+    contactNo: string;
+    email: string;
+    avatar?: string;
+  };
 }
